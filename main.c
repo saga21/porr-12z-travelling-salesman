@@ -1,0 +1,396 @@
+#include <stdlib.h> // rand
+#include <stdio.h> // printf
+#include <time.h> // time
+#include <math.h> // sqrt
+
+//TODO: Remove sleep function
+#ifdef _WIN32
+	#include <windows.h> // Sleep
+#else
+	#include <sys/time.h>
+#endif
+
+#define DIM 600 //
+#define MAX_COORD 100.0f //
+
+// GLUT & OpenGL libraries
+#include <GL/glut.h>
+#include <GL/gl.h>
+
+struct town {
+	float x;
+	float y;
+};
+
+// Globals
+struct town *towns;
+int **population; // [][]
+float **weights; // [][]
+
+unsigned long long global_iteration_counter;
+//TODO zmiana nazwy zmiennej
+int global_best_osobnik_index = 0;
+
+// Parameters from command line
+int towns_count;
+int mi_constant;
+int m_constant;
+
+// ----------------------------------------------------------------------------
+
+void draw_best() {
+
+	int i;
+	glColor3f(1.0f, 0.80f, 0.1f);
+	glLineWidth(1);
+	glBegin(GL_LINE_LOOP);
+	for(i = 0; i < towns_count; i++) {
+		glVertex2f(towns[population[global_best_osobnik_index][i]].x,
+			towns[population[global_best_osobnik_index][i]].y);
+	}
+	glEnd();
+	
+	//TODO remove this line
+	global_best_osobnik_index = ++global_best_osobnik_index % mi_constant;
+}
+
+// ----------------------------------------------------------------------------
+
+void generate_population() {
+
+	int i, k, j, temp;
+
+	population = (int**)malloc(mi_constant * sizeof(int*));
+
+	for (i = 0; i < mi_constant; i++) {	
+
+		population[i] = (int*)malloc(towns_count * sizeof(int));
+
+		for (k = 0; k < towns_count; k++)
+			population[i][k] = k;
+	    
+		for (k = towns_count-1; k > 0; k--) {
+			j = rand() % (k+1);
+			temp = population[i][j];
+			population[i][j] = population[i][k];
+			population[i][k] = temp;
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------
+
+void destroy_population() {
+	
+	int i;
+
+	for (i = 0; i < mi_constant; i++)
+		free(population[i]);
+	
+	free(population);
+}
+
+// ----------------------------------------------------------------------------
+
+void print_best() {
+	int i;
+	float v = 0.0;
+	float t = 0.0;
+	// Sum of weights
+	for(i = 0; i < towns_count-1; i++) {
+		//calculate zwraca dobra wartosc
+		t = calculate_weight(population[global_best_osobnik_index][i], population[global_best_osobnik_index][i+1]);
+		printf("TODO s out calculate_weight: %f\n", t);
+		// t jest jakies dziwne...
+	//	v += t;
+	//	printf("t: %f, v: %f\n", t, v);
+	}
+	
+	//fprintf(stderr, "%f [%d]", v, global_best_osobnik_index);
+	//for(i = 0; i < towns_count; i++)
+	//	fprintf(stderr, " %d", population[global_best_osobnik_index][i]);
+	
+	//fprintf(stderr, "\n");
+}
+
+// ----------------------------------------------------------------------------
+
+void print_population_info() {
+	fprintf(stderr, "Display iteration %d\n", global_iteration_counter);
+	print_best();
+	return;
+}
+
+// ----------------------------------------------------------------------------
+
+float calculate_weight(int i, int j) {
+	
+	float px;
+	float py;
+	float s;
+	//printf("calculate pow x: %f\n", pow(towns[i].x - towns[j].x, 2));
+	//printf("calculate pow y: %f\n", pow(towns[i].y - towns[j].y, 2));
+	px = pow(towns[i].x - towns[j].x, 2);
+	py = pow(towns[i].y - towns[j].y, 2);
+	//printf("calculate pow x: %f\n", px);
+	//printf("calculate pow y: %f\n", py);
+	//s = px + py;
+	//printf("calculate sum[%d][%d]: %f\n", i, j, s);
+	s = sqrt(px + py);
+	//printf("calculate sqrt[%d][%d]: %f\n", i, j, s);
+	//printf("calculate sum[%d][%d]: %f\n", i, j, pow(towns[i].x - towns[j].x, 2) + pow(towns[i].y - towns[j].y, 2));
+	//return sqrt( pow(towns[i].x - towns[j].x, 2) + 
+	//	pow(towns[i].y - towns[j].y, 2) );
+	printf("TODO s in  calculate_weight: %f\n", s);
+	return s;
+	
+}
+
+// ----------------------------------------------------------------------------
+
+void generate_weight_matrix() {
+	
+	int i, j;
+	float tmp;
+
+	// Allocate memory
+	weights = (float**)malloc(towns_count * sizeof(float*));
+	
+	for (i = 0; i < towns_count; i++)
+		weights[i] = (float*)malloc(towns_count * sizeof(float));
+
+	for (i = 0; i < towns_count; i++) {	
+		
+		for (j = 0; j < towns_count; j++) {
+			tmp = calculate_weight(i, j);
+			weights[i][j] = tmp;
+			weights[j][i] = tmp;
+		} // for j
+	} // for i
+}
+
+// ----------------------------------------------------------------------------
+
+void destroy_weight_matrix() {
+	
+	int i;
+
+	for (i = 0; i < towns_count; i++)
+		free(weights[i]);
+		
+	free(weights);
+}
+
+// ----------------------------------------------------------------------------
+
+void generate_towns() {
+
+	int i;
+	// Allocate memory
+	towns = (struct town*)malloc(sizeof(struct town)*towns_count);
+
+	// Generate towns
+	srand(time(NULL));
+	for (i = 0; i < towns_count; i++) {
+		towns[i].x = - MAX_COORD + (float)rand()/((float)RAND_MAX/MAX_COORD/2);
+		towns[i].y = - MAX_COORD + (float)rand()/((float)RAND_MAX/MAX_COORD/2);
+	}
+}
+
+// ----------------------------------------------------------------------------
+
+void destroy_towns() {
+
+	free(towns);
+}
+
+// ----------------------------------------------------------------------------
+
+void init(int argc, char **argv) {
+	int i;
+	
+	// Read file
+	// TODO
+	
+	towns_count = 0;
+	mi_constant = 0;
+	m_constant = 0;
+
+	// Process execute parameters
+	if (argc == 4) {
+		towns_count = atoi(argv[1]);
+		mi_constant = atoi(argv[2]);
+		m_constant = atoi(argv[3]);
+	}
+	else {
+		fprintf(stderr, "argc: %d\n", argc);
+	}
+	if (towns_count==0) towns_count = 30;
+	if (mi_constant==0) mi_constant = 1000;
+	if (m_constant==0) m_constant = 10;
+	
+	generate_towns();
+
+	// Generate connectivity weight matrix
+	generate_weight_matrix();
+
+	// Generate population
+	generate_population();
+	
+	// Reset iteration counter
+	global_iteration_counter = 0;
+
+} // init()
+
+// ----------------------------------------------------------------------------
+
+void terminate()
+{
+	print_population_info();
+	fprintf(stderr, "Quiting");
+	destroy_towns();
+	destroy_weight_matrix();
+	destroy_population();
+	fprintf(stderr, ".\n");
+	exit(0);
+} // terminate()
+
+// ----------------------------------------------------------------------------
+
+void drawString (char *s)
+{
+	unsigned int i;
+	for (i = 0; i < strlen (s); i++)
+		glutBitmapCharacter (GLUT_BITMAP_HELVETICA_10, s[i]);
+}
+
+// ----------------------------------------------------------------------------
+
+void reshape (int w, int h)
+{
+	glMatrixMode (GL_MODELVIEW);
+	glLoadIdentity ();
+	glViewport (0, 0, w, h);
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity ();
+	gluOrtho2D (-MAX_COORD*1.1, MAX_COORD*1.1, -MAX_COORD*1.1, MAX_COORD*1.1);
+	glEnable (GL_LINE_SMOOTH);
+	glEnable (GL_LINE_STIPPLE);
+}
+
+// ----------------------------------------------------------------------------
+
+void display (void)
+{
+	static char label[100];
+	int i;
+	
+	// Clean drawing board
+	glClear (GL_COLOR_BUFFER_BIT);
+
+	// Draw outsite box
+	glColor3f (0.1F, 0.80F, 0.1F);
+	glLineWidth (1);
+	glBegin (GL_LINE_LOOP);
+	glVertex2f (-MAX_COORD, -MAX_COORD);
+	glVertex2f ( MAX_COORD, -MAX_COORD);
+	glVertex2f ( MAX_COORD,  MAX_COORD);
+	glVertex2f (-MAX_COORD,  MAX_COORD);
+	glEnd ();
+	
+	// Draw towns
+	/*glLineWidth (1);
+	for (i = 0; i < towns_count; i++) {
+		glBegin(GL_LINE_LOOP);
+		glVertex2f(towns[i].x-1, towns[i].y-1);
+		glVertex2f(towns[i].x-1, towns[i].y+1);
+		glVertex2f(towns[i].x+1, towns[i].y+1);
+		glVertex2f(towns[i].x+1, towns[i].y-1);
+		glEnd();
+	}*/
+
+	// Draw population
+	draw_best();
+
+	// Axis Labels
+	glColor3f (1.0F, 1.0F, 1.0F);
+	// TODO: best unit
+	sprintf (label, "Best %d", 12);
+	glRasterPos2f (-MAX_COORD, -MAX_COORD*1.05);
+	drawString (label);
+	
+	glutSwapBuffers ();
+	print_population_info();
+}
+
+// ----------------------------------------------------------------------------
+
+void keyboard (unsigned char key_code, int xpos, int ypos)
+{
+	switch (key_code) {
+		case 32: // Spacebar
+			display();
+			break;
+		// Quit Application
+		case 'q':
+		case 'Q':
+		case 27 : // Esc
+			glFinish();
+			terminate();
+		}
+}
+
+// ----------------------------------------------------------------------------
+
+void evo_iter(void)
+{
+	//TODO Evolve - Iteration step
+}
+
+// ----------------------------------------------------------------------------
+
+void idle (void)
+{
+	// Next generation
+	evo_iter();
+
+	//TODO - remove this sleep functions
+#ifdef _WIN32
+	Sleep(100); // ms
+#else
+	sleep(1);
+#endif
+
+	// Every n'th iteration
+	//if (global_iteration_counter++%100 == 0)
+		// Update main and sub window
+		glutPostRedisplay(); //display();
+};
+
+// ----------------------------------------------------------------------------
+
+int main (int argc, char **argv)
+{
+	
+	// Init data
+	init(argc, argv);
+
+	// Glut initializations
+	glutInit (&argc, argv);
+	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGBA);
+	glutInitWindowPosition (100, 100);
+	glutInitWindowSize (DIM, DIM);
+
+	// Main window creation and setup
+	glutCreateWindow ("Evo-salesman");
+	glutDisplayFunc    (display);
+	glutReshapeFunc   (reshape);
+	glutKeyboardFunc (keyboard);
+	glutIdleFunc         (idle);
+	
+	//fprintf(stderr, "Init success\n");
+
+	glutMainLoop();
+
+	return 0;
+}
