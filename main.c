@@ -10,10 +10,12 @@
 	#include <sys/time.h>
 #endif
 
-#define DIM 600 //
-#define MAX_COORD 100.0f //
+// Default dimension of OpenGL Window
+#define DIM 600
+// Maximum coordinate of town
+#define MAX_COORD 1000.0f
 
-// GLUT & OpenGL libraries
+// GLUT and OpenGL libraries
 #include <GL/glut.h>
 #include <GL/gl.h>
 
@@ -23,13 +25,12 @@ struct town {
 };
 
 // Globals
-struct town *towns;
+struct town *towns; // []
 int **population; // [][]
 float **weights; // [][]
 
 unsigned long global_iteration_counter;
-//TODO zmiana nazwy zmiennej
-int global_best_osobnik_index = 0;
+int best_index = 0;
 
 // Parameters from command line
 int towns_count;
@@ -86,8 +87,8 @@ float calculate_best() {
 
 	// Sum of weights
 	for(i = 0; i < towns_count-1; i++)
-		v += calculate_weight(population[global_best_osobnik_index][i], population[global_best_osobnik_index][i+1]);
-	//printf("%f\n", v);
+		v += calculate_weight(population[best_index][i], population[best_index][i+1]);
+	
 	return v;
 }
 // ----------------------------------------------------------------------------
@@ -101,22 +102,19 @@ void draw_best() {
 	glLineWidth(1);
 	glBegin(GL_LINE_LOOP);
 	for(i = 0; i < towns_count; i++) {
-		glVertex2f(towns[population[global_best_osobnik_index][i]].x,
-			towns[population[global_best_osobnik_index][i]].y);
+		glVertex2f(towns[population[best_index][i]].x,
+			towns[population[best_index][i]].y);
 	}
 	glEnd();
 	
 	// Axis Labels
 	glColor3f (1.0F, 1.0F, 1.0F);
-	
 	sprintf_s(label, 100, "Best value: %f Iteration: %lu", calculate_best(), global_iteration_counter);
-	//sprintf_s(label, 1000, "Iteration: %d Best: %f",
-		//global_iteration_counter, dbg);
 	glRasterPos2f (-MAX_COORD, -MAX_COORD*1.05);
 	drawString (label);
 
-	//TODO remove this line, now to illustrate animation
-	global_best_osobnik_index = ++global_best_osobnik_index % mi_constant;
+	//TODO remove this line, now it is for illustrate animation
+	best_index = ++best_index % mi_constant;
 }
 
 // ----------------------------------------------------------------------------
@@ -134,13 +132,14 @@ void destroy_population() {
 // ----------------------------------------------------------------------------
 
 void print_best() {
+	
 	int i;
 	float v = 0.0;
 	float t = 0.0;
 
-	fprintf(stderr, "%f [%d]", calculate_best(), global_best_osobnik_index);
+	fprintf(stderr, "%f [%d]", calculate_best(), best_index);
 	for(i = 0; i < towns_count; i++)
-		fprintf(stderr, " %d", population[global_best_osobnik_index][i]);
+		fprintf(stderr, " %d", population[best_index][i]);
 	
 	fprintf(stderr, "\n");
 }
@@ -148,6 +147,7 @@ void print_best() {
 // ----------------------------------------------------------------------------
 
 void print_population_info() {
+
 	fprintf(stderr, "Iteration %lu\n", global_iteration_counter);
 	print_best();
 	return;
@@ -193,6 +193,7 @@ void destroy_weight_matrix() {
 void generate_towns() {
 
 	int i;
+	
 	// Allocate memory
 	towns = (struct town*)malloc(sizeof(struct town)*towns_count);
 
@@ -247,8 +248,7 @@ void init(int argc, char **argv) {
 
 // ----------------------------------------------------------------------------
 
-void terminate()
-{
+void terminate() {
 	print_population_info();
 	fprintf(stderr, "Quiting");
 	destroy_towns();
@@ -260,8 +260,7 @@ void terminate()
 
 // ----------------------------------------------------------------------------
 
-void reshape (int w, int h)
-{
+void reshape (int w, int h) {
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
 	glViewport (0, 0, w, h);
@@ -274,8 +273,7 @@ void reshape (int w, int h)
 
 // ----------------------------------------------------------------------------
 
-void display (void)
-{
+void display (void) {
 	// Clean drawing board
 	glClear (GL_COLOR_BUFFER_BIT);
 
@@ -308,8 +306,7 @@ void display (void)
 
 // ----------------------------------------------------------------------------
 
-void keyboard (unsigned char key_code, int xpos, int ypos)
-{
+void keyboard (unsigned char key_code, int xpos, int ypos) {
 	switch (key_code) {
 		case 32: // Spacebar
 			display();
@@ -317,7 +314,6 @@ void keyboard (unsigned char key_code, int xpos, int ypos)
 		case 'i':
 			print_population_info();
 			break;
-		// Quit Application
 		case 'q':
 		case 'Q':
 		case 27 : // Esc
@@ -328,15 +324,14 @@ void keyboard (unsigned char key_code, int xpos, int ypos)
 
 // ----------------------------------------------------------------------------
 
-void evo_iter(void)
-{
+void evo_iter(void) {
 	//TODO Evolve - Iteration step
+	
 }
 
 // ----------------------------------------------------------------------------
 
-void idle (void)
-{
+void idle (void) {
 	// Next generation
 	evo_iter();
 
@@ -357,9 +352,7 @@ void idle (void)
 
 // ----------------------------------------------------------------------------
 
-int main (int argc, char **argv)
-{
-	
+int main (int argc, char **argv) {	
 	// Init data
 	init(argc, argv);
 
