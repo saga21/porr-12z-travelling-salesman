@@ -22,24 +22,8 @@
 // GLUT and OpenGL libraries
 #include <GL/glut.h>
 #include <GL/gl.h>
+#include "evolutionLib.h"
 
-struct town {
-	float x;
-	float y;
-};
-
-// Globals
-struct town *towns; // []
-int **population; // [][]
-float **weights; // [][]
-
-unsigned long global_iteration_counter;
-int best_index = 0;
-
-// Parameters from command line
-int towns_count;
-int mi_constant;
-int m_constant;
 
 // ----------------------------------------------------------------------------
 
