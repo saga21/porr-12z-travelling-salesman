@@ -8,8 +8,8 @@
 #define MAP_SIZE 1000
 
 typedef struct {
-	int id;
-	int x;
+	int id; //nie potrzebne
+	int x;	//floaty
 	int y;
 } town;
 
@@ -147,8 +147,8 @@ int main(int argc, const char* argv[]){
 
 	pmx(townArrayA,townArrayB,ca,cb);
 
-	memset(ca,0,(sizeof(town *))*NO_TOWNS);
-	memset(cb,0,(sizeof(town *))*NO_TOWNS);
+	//memset(ca,0,(sizeof(town *))*NO_TOWNS);
+	//memset(cb,0,(sizeof(town *))*NO_TOWNS);
 
 	free(ca);
 	free(cb);

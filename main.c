@@ -2,12 +2,16 @@
 #include <stdio.h> // printf
 #include <time.h> // time
 #include <math.h> // sqrt
+#include <string.h>
 
 //TODO: Remove sleep function
 #ifdef _WIN32
 	#include <windows.h> // Sleep
 #else
 	#include <sys/time.h>
+	#define sprintf_s(buffer,size,...) snprintf (buffer,size, __VA_ARGS__)
+	
+
 #endif
 
 // Default dimension of OpenGL Window
