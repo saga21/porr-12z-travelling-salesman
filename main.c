@@ -27,7 +27,7 @@ struct town *towns;
 int **population; // [][]
 float **weights; // [][]
 
-unsigned long long global_iteration_counter;
+unsigned long global_iteration_counter;
 //TODO zmiana nazwy zmiennej
 int global_best_osobnik_index = 0;
 
@@ -38,20 +38,11 @@ int m_constant;
 
 // ----------------------------------------------------------------------------
 
-void draw_best() {
-
-	int i;
-	glColor3f(1.0f, 0.80f, 0.1f);
-	glLineWidth(1);
-	glBegin(GL_LINE_LOOP);
-	for(i = 0; i < towns_count; i++) {
-		glVertex2f(towns[population[global_best_osobnik_index][i]].x,
-			towns[population[global_best_osobnik_index][i]].y);
-	}
-	glEnd();
-	
-	//TODO remove this line
-	global_best_osobnik_index = ++global_best_osobnik_index % mi_constant;
+void drawString (char *s)
+{
+	unsigned int i;
+	for (i = 0; i < strlen (s); i++)
+		glutBitmapCharacter (GLUT_BITMAP_HELVETICA_10, s[i]);
 }
 
 // ----------------------------------------------------------------------------
@@ -80,6 +71,56 @@ void generate_population() {
 
 // ----------------------------------------------------------------------------
 
+float calculate_weight(int i, int j) {
+	
+	return sqrt( pow(towns[i].x - towns[j].x, 2) + 
+		pow(towns[i].y - towns[j].y, 2) );
+}
+
+// ----------------------------------------------------------------------------
+
+float calculate_best() {
+
+	int i;
+	float v = 0.0;
+
+	// Sum of weights
+	for(i = 0; i < towns_count-1; i++)
+		v += calculate_weight(population[global_best_osobnik_index][i], population[global_best_osobnik_index][i+1]);
+	//printf("%f\n", v);
+	return v;
+}
+// ----------------------------------------------------------------------------
+
+void draw_best() {
+
+	int i;
+	static char label[100];
+
+	glColor3f(1.0f, 0.80f, 0.1f);
+	glLineWidth(1);
+	glBegin(GL_LINE_LOOP);
+	for(i = 0; i < towns_count; i++) {
+		glVertex2f(towns[population[global_best_osobnik_index][i]].x,
+			towns[population[global_best_osobnik_index][i]].y);
+	}
+	glEnd();
+	
+	// Axis Labels
+	glColor3f (1.0F, 1.0F, 1.0F);
+	
+	sprintf_s(label, 100, "Best value: %f Iteration: %lu", calculate_best(), global_iteration_counter);
+	//sprintf_s(label, 1000, "Iteration: %d Best: %f",
+		//global_iteration_counter, dbg);
+	glRasterPos2f (-MAX_COORD, -MAX_COORD*1.05);
+	drawString (label);
+
+	//TODO remove this line, now to illustrate animation
+	global_best_osobnik_index = ++global_best_osobnik_index % mi_constant;
+}
+
+// ----------------------------------------------------------------------------
+
 void destroy_population() {
 	
 	int i;
@@ -96,54 +137,20 @@ void print_best() {
 	int i;
 	float v = 0.0;
 	float t = 0.0;
-	// Sum of weights
-	for(i = 0; i < towns_count-1; i++) {
-		//calculate zwraca dobra wartosc
-		t = calculate_weight(population[global_best_osobnik_index][i], population[global_best_osobnik_index][i+1]);
-		printf("TODO s out calculate_weight: %f\n", t);
-		// t jest jakies dziwne...
-	//	v += t;
-	//	printf("t: %f, v: %f\n", t, v);
-	}
+
+	fprintf(stderr, "%f [%d]", calculate_best(), global_best_osobnik_index);
+	for(i = 0; i < towns_count; i++)
+		fprintf(stderr, " %d", population[global_best_osobnik_index][i]);
 	
-	//fprintf(stderr, "%f [%d]", v, global_best_osobnik_index);
-	//for(i = 0; i < towns_count; i++)
-	//	fprintf(stderr, " %d", population[global_best_osobnik_index][i]);
-	
-	//fprintf(stderr, "\n");
+	fprintf(stderr, "\n");
 }
 
 // ----------------------------------------------------------------------------
 
 void print_population_info() {
-	fprintf(stderr, "Display iteration %d\n", global_iteration_counter);
+	fprintf(stderr, "Iteration %lu\n", global_iteration_counter);
 	print_best();
 	return;
-}
-
-// ----------------------------------------------------------------------------
-
-float calculate_weight(int i, int j) {
-	
-	float px;
-	float py;
-	float s;
-	//printf("calculate pow x: %f\n", pow(towns[i].x - towns[j].x, 2));
-	//printf("calculate pow y: %f\n", pow(towns[i].y - towns[j].y, 2));
-	px = pow(towns[i].x - towns[j].x, 2);
-	py = pow(towns[i].y - towns[j].y, 2);
-	//printf("calculate pow x: %f\n", px);
-	//printf("calculate pow y: %f\n", py);
-	//s = px + py;
-	//printf("calculate sum[%d][%d]: %f\n", i, j, s);
-	s = sqrt(px + py);
-	//printf("calculate sqrt[%d][%d]: %f\n", i, j, s);
-	//printf("calculate sum[%d][%d]: %f\n", i, j, pow(towns[i].x - towns[j].x, 2) + pow(towns[i].y - towns[j].y, 2));
-	//return sqrt( pow(towns[i].x - towns[j].x, 2) + 
-	//	pow(towns[i].y - towns[j].y, 2) );
-	printf("TODO s in  calculate_weight: %f\n", s);
-	return s;
-	
 }
 
 // ----------------------------------------------------------------------------
@@ -207,11 +214,7 @@ void destroy_towns() {
 // ----------------------------------------------------------------------------
 
 void init(int argc, char **argv) {
-	int i;
-	
-	// Read file
-	// TODO
-	
+		
 	towns_count = 0;
 	mi_constant = 0;
 	m_constant = 0;
@@ -257,15 +260,6 @@ void terminate()
 
 // ----------------------------------------------------------------------------
 
-void drawString (char *s)
-{
-	unsigned int i;
-	for (i = 0; i < strlen (s); i++)
-		glutBitmapCharacter (GLUT_BITMAP_HELVETICA_10, s[i]);
-}
-
-// ----------------------------------------------------------------------------
-
 void reshape (int w, int h)
 {
 	glMatrixMode (GL_MODELVIEW);
@@ -282,9 +276,6 @@ void reshape (int w, int h)
 
 void display (void)
 {
-	static char label[100];
-	int i;
-	
 	// Clean drawing board
 	glClear (GL_COLOR_BUFFER_BIT);
 
@@ -311,16 +302,8 @@ void display (void)
 
 	// Draw population
 	draw_best();
-
-	// Axis Labels
-	glColor3f (1.0F, 1.0F, 1.0F);
-	// TODO: best unit
-	sprintf (label, "Best %d", 12);
-	glRasterPos2f (-MAX_COORD, -MAX_COORD*1.05);
-	drawString (label);
 	
-	glutSwapBuffers ();
-	print_population_info();
+	glutSwapBuffers();
 }
 
 // ----------------------------------------------------------------------------
@@ -330,6 +313,9 @@ void keyboard (unsigned char key_code, int xpos, int ypos)
 	switch (key_code) {
 		case 32: // Spacebar
 			display();
+			break;
+		case 'i':
+			print_population_info();
 			break;
 		// Quit Application
 		case 'q':
@@ -356,15 +342,17 @@ void idle (void)
 
 	//TODO - remove this sleep functions
 #ifdef _WIN32
-	Sleep(100); // ms
+	Sleep(10); // ms
 #else
 	sleep(1);
 #endif
 
 	// Every n'th iteration
-	//if (global_iteration_counter++%100 == 0)
+	if (global_iteration_counter++%100 == 0) {
 		// Update main and sub window
 		glutPostRedisplay(); //display();
+		print_population_info();
+	}
 };
 
 // ----------------------------------------------------------------------------
