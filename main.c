@@ -369,23 +369,20 @@ void evo_iter(void) {
 	int i,x,y,tmp;
 
 		
-
+	//dla wszystkich dzieci
 	for(i = mi_constant; i < M_MI; ++i){
+		//wylosuj rodziców (można by coś mądrzejszego)
 		x = rand() % mi_constant;
 		y = rand() % mi_constant;
+
 		//printf("X: %d , Y: %d\n",x,y);
+		//zrob dziecko
 		pmx(x,y,i,-1);
-		// printf("%d:\t\t",x);
-		// for(tmp = 0; tmp < towns_count; ++tmp){
-		// 	printf("%d ", population[x][tmp]);
-		// } printf("\n%d:\t\t",y);
-		// for(tmp = 0; tmp < towns_count; ++tmp){
-		// 	printf("%d ", population[y][tmp]);
-		// } printf("\n%d:\t\t",i);
-		// for(tmp = 0; tmp < towns_count; ++tmp){
-		// 	printf("%d ", population[i][tmp]);
-		// } printf("\nPO CHILD %d\n",i);
+		
+		//policz jego odleglosc
 		overall_lengths[i] = calculate_overall_length(i);
+
+		//jesli lepsza niz ojca to zamien (trzeba cos madrzejszego)
 		if(overall_lengths[i] < overall_lengths[x]){
 			swapRows(population[i],population[x]);
 			swapf(&overall_lengths[i], &overall_lengths[x]);
