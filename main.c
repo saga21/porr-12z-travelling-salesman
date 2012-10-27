@@ -40,14 +40,15 @@ void generate_population() {
 
 	int i, k, j, temp;
 
-	population = (int**)malloc(mi_constant * sizeof(int*));
+	population = (int**)malloc(M_MI * sizeof(int*));
 
-	for (i = 0; i < mi_constant; i++) {	
+	for (i = 0; i < M_MI; i++) {	
 
 		population[i] = (int*)malloc(towns_count * sizeof(int));
 
-		for (k = 0; k < towns_count; k++)
+		for (k = 0; k < towns_count; k++){
 			population[i][k] = k;
+		}
 	    
 		for (k = towns_count-1; k > 0; k--) {
 			j = rand() % (k+1);
@@ -68,23 +69,53 @@ float calculate_weight(int i, int j) {
 
 // ----------------------------------------------------------------------------
 
-float calculate_best() {
+float calculate_overall_length(int index) {
 
-	int i;
-	float v = 0.0;
+	int i,x,y;
+	float v = 0;
+
+	// for ( i = 0; i < M_MI; ++i)
+	// {
+	// 	for ( x = 0; i < towns_count; ++x)
+	// 		{
+	// 				printf("%d ", population[i][x]);
+	// 		}
+	// 		printf("\n");
+	// }
 
 	// Sum of weights
-	for(i = 0; i < towns_count-1; i++)
-		v += calculate_weight(population[best_index][i], population[best_index][i+1]);
+	for(i = 0; i < towns_count-1; i++){
+		x = population[index][i];
+		y = population[index][i+1];		
+		v += weights[population[index][i]][population[index][i+1]];
+	}
+	//TODO last first also?
 	
 	return v;
 }
+
+// ----------------------------------------------------------------------------
+
+void find_best(){
+	int i;
+	best_value = 1000000000; //TODO max float
+
+	for(i = 0; i < mi_constant; ++i){
+		if(best_value > overall_lengths[i]){
+			best_value = overall_lengths[i];
+			best_index = i;
+		} 
+	}
+}
+
 // ----------------------------------------------------------------------------
 
 void draw_best() {
 
 	int i;
 	static char label[100];
+
+	find_best();
 
 	glColor3f(1.0f, 0.80f, 0.1f);
 	glLineWidth(1);
@@ -97,12 +128,12 @@ void draw_best() {
 	
 	// Axis Labels
 	glColor3f (1.0F, 1.0F, 1.0F);
-	sprintf_s(label, 100, "Best value: %f Iteration: %lu", calculate_best(), global_iteration_counter);
+	sprintf_s(label, 100, "Best value: %f Iteration: %lu", best_value, global_iteration_counter);
 	glRasterPos2f (-MAX_COORD, -MAX_COORD*1.05);
 	drawString (label);
 
 	//TODO remove this line, now it is for illustrate animation
-	best_index = ++best_index % mi_constant;
+	//best_index = ++best_index % mi_constant;
 }
 
 // ----------------------------------------------------------------------------
@@ -111,7 +142,7 @@ void destroy_population() {
 	
 	int i;
 
-	for (i = 0; i < mi_constant; i++)
+	for (i = 0; i < M_MI; i++)
 		free(population[i]);
 	
 	free(population);
@@ -125,7 +156,7 @@ void print_best() {
 	float v = 0.0;
 	float t = 0.0;
 
-	fprintf(stderr, "%f [%d]", calculate_best(), best_index);
+	fprintf(stderr, "%f [%d]", best_value, best_index);
 	for(i = 0; i < towns_count; i++)
 		fprintf(stderr, " %d", population[best_index][i]);
 	
@@ -186,7 +217,6 @@ void generate_towns() {
 	towns = (struct town*)malloc(sizeof(struct town)*towns_count);
 
 	// Generate towns
-	srand(time(NULL));
 	for (i = 0; i < towns_count; i++) {
 		towns[i].x = - MAX_COORD + (float)rand()/((float)RAND_MAX/MAX_COORD/2);
 		towns[i].y = - MAX_COORD + (float)rand()/((float)RAND_MAX/MAX_COORD/2);
@@ -198,6 +228,21 @@ void generate_towns() {
 void destroy_towns() {
 
 	free(towns);
+}
+
+// ----------------------------------------------------------------------------
+void generate_population_overall_length(){
+	int i;
+
+	overall_lengths = (float*)malloc(M_MI * sizeof(float));
+	for(i = 0; i < M_MI; ++i){
+		overall_lengths[i] = calculate_overall_length(i);
+	}
+}
+
+// ----------------------------------------------------------------------------
+void destroy_population_overall_length(){
+	free(overall_lengths);
 }
 
 // ----------------------------------------------------------------------------
@@ -232,6 +277,9 @@ void init(int argc, char **argv) {
 	// Reset iteration counter
 	global_iteration_counter = 0;
 
+	//Each element holds current path length
+	generate_population_overall_length();
+
 } // init()
 
 // ----------------------------------------------------------------------------
@@ -242,6 +290,7 @@ void terminate() {
 	destroy_towns();
 	destroy_weight_matrix();
 	destroy_population();
+	destroy_population_overall_length();
 	fprintf(stderr, ".\n");
 	exit(0);
 } // terminate()
@@ -261,6 +310,9 @@ void reshape (int w, int h) {
 
 // ----------------------------------------------------------------------------
 
+
+
+//
 void display (void) {
 	// Clean drawing board
 	glClear (GL_COLOR_BUFFER_BIT);
@@ -314,6 +366,31 @@ void keyboard (unsigned char key_code, int xpos, int ypos) {
 
 void evo_iter(void) {
 	//TODO Evolve - Iteration step
+	int i,x,y,tmp;
+
+		
+
+	for(i = mi_constant; i < M_MI; ++i){
+		x = rand() % mi_constant;
+		y = rand() % mi_constant;
+		//printf("X: %d , Y: %d\n",x,y);
+		pmx(x,y,i,-1);
+		// printf("%d:\t\t",x);
+		// for(tmp = 0; tmp < towns_count; ++tmp){
+		// 	printf("%d ", population[x][tmp]);
+		// } printf("\n%d:\t\t",y);
+		// for(tmp = 0; tmp < towns_count; ++tmp){
+		// 	printf("%d ", population[y][tmp]);
+		// } printf("\n%d:\t\t",i);
+		// for(tmp = 0; tmp < towns_count; ++tmp){
+		// 	printf("%d ", population[i][tmp]);
+		// } printf("\nPO CHILD %d\n",i);
+		overall_lengths[i] = calculate_overall_length(i);
+		if(overall_lengths[i] < overall_lengths[x]){
+			swapRows(population[i],population[x]);
+			swapf(&overall_lengths[i], &overall_lengths[x]);
+		}
+	}
 	
 }
 
@@ -327,7 +404,7 @@ void idle (void) {
 #ifdef _WIN32
 	Sleep(10); // ms
 #else
-	sleep(1);
+	usleep(1000);
 #endif
 
 	// Every n'th iteration
@@ -341,6 +418,7 @@ void idle (void) {
 // ----------------------------------------------------------------------------
 
 int main (int argc, char **argv) {	
+	srand ( time(NULL) );
 	// Init data
 	init(argc, argv);
 
