@@ -1,8 +1,4 @@
 #pragma once
-//#ifndef GLOBALS_H
-//#define GLOBALS_H
-
-#include <float.h> // FLT_MAX
 
 // Default dimension of OpenGL Window
 #define DIM 600
@@ -12,12 +8,8 @@
 // Global iteration counter
 unsigned long global_iteration_counter;
 
-// TODO: why do we need static here?
-// It won't compile if not static
-// Compiler says these values are already defined in main.obj and mechanics.obj
-// If static, OpenGL draw wrong value
-static int best_index = 0;
-static float best_value = FLT_MAX;
+extern int best_index;
+extern float best_value;
 
 // Parameters from command line
 int towns_count;
@@ -34,5 +26,3 @@ struct town *towns; // []
 int **population; // [][]
 float **weights; // [][]
 float *overall_lengths; // []
-
-//#endif

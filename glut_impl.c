@@ -1,7 +1,7 @@
 
 #include <stdio.h> // printf
 #include <string.h> // strlen
-
+#include <time.h>
 // GLUT and OpenGL libraries
 #include <GL/glut.h>
 #include <GL/gl.h>
@@ -103,7 +103,6 @@ void keyboard(unsigned char key_code, int xpos, int ypos) {
 void idle(void) {
 	// Next generation
 	evo_iter();
-
 	// Every n'th iteration
 	// TODO Change 100 to parameter
 	if (global_iteration_counter++%100 == 0) {
