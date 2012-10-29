@@ -1,34 +1,14 @@
+#pragma once
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 #include <time.h>
-
-#define M_MI (mi_constant+m_constant)
+#include <float.h>
+#include "globals.h"
 
 //8948061100002391241
-
-struct town {
-	float x;
-	float y;
-};
-
-// Globals
-struct town *towns; // []
-int **population; // [][]
-float **weights; // [][]
-float *overall_lengths; //[]
-
-unsigned long global_iteration_counter;
-int best_index = 0;
-float best_value = 10000000000; //TODO max float?
-
-// Parameters from command line
-int towns_count;
-int mi_constant;
-int m_constant;
-
-
 
 void swap(int *a, int *b){
 	int tmp;
@@ -96,8 +76,6 @@ void checkDuplicates(int a, int b, int child, int x, int y){
 
 	free(counts);
 }
-
-
 
 int pmx(int a, int b, int childA, int childB){
 	int x,y,i;
