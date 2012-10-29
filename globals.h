@@ -9,8 +9,6 @@
 // Maximum coordinate of town
 #define MAX_COORD 1000.0f
 
-#define M_MI (mi_constant+m_constant)
-
 // Global iteration counter
 unsigned long global_iteration_counter;
 

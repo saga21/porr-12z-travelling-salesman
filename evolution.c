@@ -9,6 +9,8 @@
 #include "evolutionLib.hpp"
 #include "evolution.h" // This header
 
+#define M_MI (mi_constant+m_constant)
+
 // ----------------------------------------------------------------------------
 
 void generate_population() {
