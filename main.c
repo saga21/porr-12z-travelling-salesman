@@ -12,7 +12,7 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include "globals.h" // DIM, ...
-#include "mechanics.h" // init
+#include "evolution.h" // init
 #include "glut_impl.h" // display, reshape, ...
 
 // ----------------------------------------------------------------------------

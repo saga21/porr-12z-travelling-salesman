@@ -7,7 +7,7 @@
 #include <GL/gl.h>
 
 #include "globals.h" // MAX_COORD
-#include "mechanics.h" // evo_iter, print_population_info
+#include "evolution.h" // evo_iter, print_population_info
 #include "glut_impl.h" // This header
 
 // ----------------------------------------------------------------------------
