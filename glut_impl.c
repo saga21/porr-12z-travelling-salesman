@@ -88,7 +88,7 @@ void keyboard(unsigned char key_code, int xpos, int ypos) {
 			display();
 			break;
 		case 'i':
-			print_population_info();
+			print_population_info(1);
 			break;
 		case 'q':
 		case 'Q':
@@ -100,14 +100,56 @@ void keyboard(unsigned char key_code, int xpos, int ypos) {
 
 // ----------------------------------------------------------------------------
 
+void ips_window_title(void) {
+	
+	static clock_t start_time; //TODO: Not initialized
+	static unsigned long iters = 0;
+	
+	float ips;
+	char buf[30];
+	clock_t time;
+	
+	time = clock();
+	
+	if (time - start_time >= CLOCKS_PER_SEC) { // one second passed
+		
+		ips = (global_iteration_counter - iters) / ((float)(time - start_time) / CLOCKS_PER_SEC);
+		sprintf_s(buf, 30, "Evo-salesman %6.0f IPS", ips);
+		start_time = time;
+		iters = global_iteration_counter;
+		glutSetWindowTitle(buf);
+
+	} // if
+
+} // fps_window_title()
+
+// ----------------------------------------------------------------------------
+
 void idle(void) {
-	// Next generation
+
+	// Compute next generation
 	evo_iter();
+
+	// Increase counter
+	++global_iteration_counter;
+
 	// Every n'th iteration
 	// TODO Change 100 to parameter
-	if (global_iteration_counter++%100 == 0) {
+	if (global_iteration_counter%100 == 0) {
 		// Update main and sub window
 		glutPostRedisplay(); //display();
-		print_population_info();
+		// Force to print population info
+		print_population_info(1);
 	}
+	else {
+		// TODO: remove this function after refactoring
+		find_best();
+		// Print only if changed
+		print_population_info(0);
+	}
+
+	// Iterations per second
+	ips_window_title();
 }
+
+// ----------------------------------------------------------------------------

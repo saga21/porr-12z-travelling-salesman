@@ -40,7 +40,7 @@ void generate_population() {
 
 float calculate_weight(int i, int j) {
 	
-	return sqrt( pow(towns[i].x - towns[j].x, 2) + 
+	return (float)sqrt( pow(towns[i].x - towns[j].x, 2) + 
 		pow(towns[i].y - towns[j].y, 2) );
 }
 
@@ -104,21 +104,28 @@ void print_best() {
 	int i;
 	float v = 0.0;
 	float t = 0.0;
+	
+	fprintf(stderr, "[%d]", best_index);
 
-	fprintf(stderr, "%f [%d]", best_value, best_index);
 	for(i = 0; i < towns_count; i++)
 		fprintf(stderr, " %d", population[best_index][i]);
 	
-	fprintf(stderr, "\n");
 }
 
 // ----------------------------------------------------------------------------
 
-void print_population_info() {
+/* If force==1 -> it prints always
+ * If force==0 -> it prints only if best_value has changed
+ */
+void print_population_info(int force) {
 
-	fprintf(stderr, "Iteration %lu\n", global_iteration_counter);
-	print_best();
-	return;
+	static float prev_best_value = FLT_MAX;
+
+	if (force || prev_best_value != best_value) {
+		fprintf(stderr, "Iter %lu: %f\n", global_iteration_counter, best_value);
+		prev_best_value = best_value;
+	}
+
 }
 
 // ----------------------------------------------------------------------------
@@ -233,9 +240,8 @@ void init(int argc, char **argv) {
 
 // ----------------------------------------------------------------------------
 
-
 void terminate() {
-	print_population_info();
+	print_population_info(1);
 	fprintf(stderr, "Quiting");
 	destroy_towns();
 	destroy_weight_matrix();
@@ -244,6 +250,8 @@ void terminate() {
 	fprintf(stderr, ".\n");
 	exit(0);
 } // terminate()
+
+// ----------------------------------------------------------------------------
 
 void evo_iter(void) {
 	//TODO Evolve - Iteration step

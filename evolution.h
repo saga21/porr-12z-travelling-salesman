@@ -14,7 +14,7 @@ float calculate_overall_length(int index);
 void generate_population_overall_length();
 void destroy_population_overall_length();
 
-void print_population_info();
+void print_population_info(int force);
 
 void find_best();
 void print_best();
