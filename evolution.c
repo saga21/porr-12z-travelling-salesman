@@ -40,8 +40,8 @@ void generate_population() {
 
 float calculate_weight(int i, int j) {
 	
-	return (float)sqrt( pow(towns[i].x - towns[j].x, 2) + 
-		pow(towns[i].y - towns[j].y, 2) );
+	return sqrtf( (towns[i].x - towns[j].x)*(towns[i].x - towns[j].x) + 
+		(towns[i].y - towns[j].y)*(towns[i].y - towns[j].y) );
 }
 
 // ----------------------------------------------------------------------------
