@@ -77,7 +77,7 @@ void checkDuplicates(int a, int b, int child, int x, int y){
 	free(counts);
 }
 
-int pmx(int a, int b, int childA, int childB){
+int pmx(int parentA, int parentB, int childA, int childB){
 	int x,y,i;
 
 	x = rand() % towns_count;
@@ -89,33 +89,40 @@ int pmx(int a, int b, int childA, int childB){
 
 	//printf("x: %d , y: %d\n",x,y);
 	
-	prepareChild(a,b,childA,x,y);
-	checkDuplicates(a,b,childA,x,y);
+	prepareChild(parentA,parentB,childA,x,y);
+	checkDuplicates(parentA,parentB,childA,x,y);
 
 	if(childB >= 0){
-		prepareChild(b,a,childB,x,y);
-		checkDuplicates(b,a,childB,x,y);
+		prepareChild(parentB,parentA,childB,x,y);
+		checkDuplicates(parentB,parentA,childB,x,y);
 	}
 
 	return 0;
  }
 
-// int main(int argc, const char* argv[]){
-// 	//initTowns();
-// 	town **ca; 
-// 	town **cb;
-// 	ca = (town **)malloc((sizeof(town *))*towns_count);
-// 	cb = (town **)malloc((sizeof(town *))*towns_count);
+int getParentRoulette(){
+	int x,i = 0,y;
+	float sum = 0;
 
-// 	pmx(townArrayA,townArrayB,ca,cb);
+	x = rand() % (int)ceil(overall_lengths_sum);
+	
+	//TO DO jest rozjazd miedzy trzymana suma a faktyczna - tylko czemu?
+	// for(y = 0; y < mi_constant; ++y){
+	// 	sum += overall_lengths[y];
+	// }
 
-// 	//memset(ca,0,(sizeof(town *))*towns_count);
-// 	//memset(cb,0,(sizeof(town *))*towns_count);
+	// printf("%d, %f\n",x,overall_lengths_sum - sum);
+	// sum = 0;
+	
+	while(sum < x && i < mi_constant){
+		sum += overall_lengths[i];		
+		++i;
+	}
+	
+	return i-1;
+}
 
-// 	free(ca);
-// 	free(cb);
-// 	return 0;
-// }
+
 
 
 

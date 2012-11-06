@@ -11,7 +11,7 @@ all:    porr1
 porr1:   $(OBJECTS) 
 	$(CC)  -o porr1  $(OBJECTS) $(LIBS)
         
-main.o: main.c glut_impl.h
+main.o: main.c
 	$(CC) $(CFLAGS) -c main.c
        
 evolution.o:  evolution.c

@@ -17,6 +17,8 @@ unsigned long global_iteration_counter;
 extern int best_index;
 extern float best_value;
 
+float overall_lengths_sum;
+
 // Parameters from command line
 int towns_count;
 int mi_constant;

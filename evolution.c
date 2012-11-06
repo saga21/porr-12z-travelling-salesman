@@ -48,7 +48,7 @@ float calculate_weight(int i, int j) {
 
 float calculate_overall_length(int index) {
 
-	int i,x,y;
+	int i;
 	float v = 0;
 
 	// for ( i = 0; i < M_MI; ++i)
@@ -61,9 +61,7 @@ float calculate_overall_length(int index) {
 	// }
 
 	// Sum of weights
-	for(i = 0; i < towns_count-1; i++){
-		x = population[index][i];
-		y = population[index][i+1];		
+	for(i = 0; i < towns_count-1; i++){	
 		v += weights[population[index][i]][population[index][i+1]];
 	}
 	//TODO last first also?
@@ -189,10 +187,14 @@ void destroy_towns() {
 // ----------------------------------------------------------------------------
 void generate_population_overall_length(){
 	int i;
+	overall_lengths_sum = 0;
 
 	overall_lengths = (float*)malloc(M_MI * sizeof(float));
 	for(i = 0; i < M_MI; ++i){
 		overall_lengths[i] = calculate_overall_length(i);
+		if(i < mi_constant){
+			overall_lengths_sum += overall_lengths[i];	
+		} 
 	}
 }
 
@@ -235,6 +237,7 @@ void init(int argc, char **argv) {
 
 	//Each element holds current path length
 	generate_population_overall_length();
+	find_best();
 
 } // init()
 
@@ -254,28 +257,41 @@ void terminate() {
 // ----------------------------------------------------------------------------
 
 void evo_iter(void) {
-	//TODO Evolve - Iteration step
 	int i,x,y,tmp;
 
 		
 	//dla wszystkich dzieci
 	for(i = mi_constant; i < M_MI; ++i){
-		//wylosuj rodziców (można by coś mądrzejszego)
-		x = rand() % mi_constant;
-		y = rand() % mi_constant;
+		
+		x = getParentRoulette();
+		y = getParentRoulette();
 
-		//printf("X: %d , Y: %d\n",x,y);
+
 		//zrob dziecko
 		pmx(x,y,i,-1);
 		
 		//policz jego odleglosc
 		overall_lengths[i] = calculate_overall_length(i);
 
-		//jesli lepsza niz ojca to zamien (trzeba cos madrzejszego)
+		
+		if(overall_lengths[y] > overall_lengths[x]){
+			x = y;
+		}
+
+		//jesli lepsza niz slabszego z rodzicow to zamien
 		if(overall_lengths[i] < overall_lengths[x]){
 			swapRows(population[i],population[x]);
+			//wazne - zmiana sumy
+			overall_lengths_sum -= overall_lengths[x];
+			overall_lengths_sum += overall_lengths[i];
+			
 			swapf(&overall_lengths[i], &overall_lengths[x]);
+
+			//wazne - zmiana najlepszego
+			if(best_value > overall_lengths[x]){
+				best_value = overall_lengths[x];
+				best_index = x;
+			}
 		}
 	}
-	
 }

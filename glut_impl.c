@@ -142,8 +142,6 @@ void idle(void) {
 		print_population_info(1);
 	}
 	else {
-		// TODO: remove this function after refactoring
-		find_best();
 		// Print only if changed
 		print_population_info(0);
 	}
