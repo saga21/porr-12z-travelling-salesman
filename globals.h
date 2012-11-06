@@ -5,6 +5,12 @@
 // Maximum coordinate of town
 #define MAX_COORD 1000.0f
 
+#ifdef _WIN32
+
+#else
+	#define sprintf_s(buffer,size,...) snprintf (buffer,size, __VA_ARGS__)
+#endif
+
 // Global iteration counter
 unsigned long global_iteration_counter;
 

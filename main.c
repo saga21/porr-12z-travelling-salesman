@@ -2,12 +2,6 @@
 //#include <stdio.h> // printf
 #include <time.h> // time
 
-#ifdef _WIN32
-
-#else
-	#define sprintf_s(buffer,size,...) snprintf (buffer,size, __VA_ARGS__)
-#endif
-
 // GLUT and OpenGL libraries
 #include <GL/glut.h>
 #include <GL/gl.h>
