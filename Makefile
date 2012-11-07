@@ -1,6 +1,6 @@
 # Makefile to build PORR1 program
 # --- macros
-CC=gcc -g
+CC=gcc -g -fopenmp
 #CFLAGS=  -O3 -I /usr/local/lib/sprng/include -I /usr/local/lib/pgplot -g
 OBJECTS=main.o evolution.o globals.o glut_impl.o roulette.o qsortPopulation.o evolutionLib.o
 LIBS = -lGL -lGLU -lglut -lm

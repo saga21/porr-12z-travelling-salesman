@@ -3,12 +3,19 @@
 
 
 void qsortPopulation(int l, int r){
-	int pivot,i,j;
+	int pivot,i,j,k;
 	float tmp;
+	int L[2],R[2];
+
 	i = l;
 	j = r;
 
+	if(l>r){
+		return;
+	}
+
 	pivot = split(l,r);
+
 
 	do
 	{
@@ -21,9 +28,17 @@ void qsortPopulation(int l, int r){
 			++i; --j;
 		}
 	} while(i < j);
-	if (l < j) qsortPopulation(l, j);
-	if (r > i) qsortPopulation(i, r);
 
+	L[0]=l;R[0]=j;
+	L[1]=i;R[1]=r;
+
+	// #pragma omp parallel
+	// {
+	// 	#pragma omp for nowait
+		for(k = 0; k < 2; ++k){
+			qsortPopulation(L[k],R[k]);
+		}
+	//}
 }
 
 int split(l,r){
