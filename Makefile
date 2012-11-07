@@ -1,8 +1,8 @@
 # Makefile to build PORR1 program
 # --- macros
-CC=gcc
+CC=gcc -g
 #CFLAGS=  -O3 -I /usr/local/lib/sprng/include -I /usr/local/lib/pgplot -g
-OBJECTS=main.o evolution.o globals.o glut_impl.o
+OBJECTS=main.o evolution.o globals.o glut_impl.o roulette.o qsortPopulation.o evolutionLib.o
 LIBS = -lGL -lGLU -lglut -lm
 
 
@@ -22,6 +22,15 @@ globals.o: globals.c
 
 glut_impl.o: glut_impl.c
 	$(CC) $(CFLAGS) -c glut_impl.c 
+
+roulette.o: roulette.c
+	$(CC) $(CFLAGS) -c roulette.c
+
+qsortPopulation.o: qsortPopulation.c
+	$(CC) $(CFLAGS) -c qsortPopulation.c 
+
+evolutionLib.o: evolutionLib.c
+	$(CC) $(CFLAGS) -c evolutionLib.c 
 
 # --- remove binary and executable files
 clean:

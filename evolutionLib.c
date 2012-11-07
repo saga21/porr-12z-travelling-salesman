@@ -1,4 +1,3 @@
-#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +6,7 @@
 #include <time.h>
 #include <float.h>
 #include "globals.h"
+#include "evolutionLib.h"
 
 //8948061100002391241
 
@@ -100,27 +100,21 @@ int pmx(int parentA, int parentB, int childA, int childB){
 	return 0;
  }
 
-int getParentRoulette(){
-	int x,i = 0,y;
-	float sum = 0;
+ void mutate(int child){
+ 	int i,x,a,b,temp,proc;
+ 	x = rand()%100;
+ 	proc = 15;
+ 	if(x <= proc){
+ 		for(i = 0; i < rand()%(int)(towns_count*proc/100);++i){
+ 			a = rand() % towns_count;
+	 		b = rand() % towns_count;
+			temp = population[child][a];
+			population[child][a] = population[child][b];
+			population[child][b] = temp;
+ 		}
+ 	}
+ }
 
-	x = rand() % (int)ceil(overall_lengths_sum);
-	
-	//TO DO jest rozjazd miedzy trzymana suma a faktyczna - tylko czemu?
-	// for(y = 0; y < mi_constant; ++y){
-	// 	sum += overall_lengths[y];
-	// }
-
-	// printf("%d, %f\n",x,overall_lengths_sum - sum);
-	// sum = 0;
-	
-	while(sum < x && i < mi_constant){
-		sum += overall_lengths[i];		
-		++i;
-	}
-	
-	return i-1;
-}
 
 
 

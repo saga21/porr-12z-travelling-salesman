@@ -6,8 +6,10 @@
 #include <float.h> // FLT_MAX
 
 #include "globals.h"
-#include "evolutionLib.hpp"
+#include "qsortPopulation.h"
+#include "evolutionLib.h"
 #include "evolution.h" // This header
+
 
 #define M_MI (mi_constant+m_constant)
 
@@ -190,12 +192,26 @@ void generate_population_overall_length(){
 	overall_lengths_sum = 0;
 
 	overall_lengths = (float*)malloc(M_MI * sizeof(float));
+
 	for(i = 0; i < M_MI; ++i){
 		overall_lengths[i] = calculate_overall_length(i);
 		if(i < mi_constant){
 			overall_lengths_sum += overall_lengths[i];	
 		} 
 	}
+}
+
+// ----------------------------------------------------------------------------
+void generate_overall_lenght_weights(){
+	int i;
+	overall_lengths_weights = (float*)malloc(mi_constant * sizeof(float));	
+	for(i = 0; i<mi_constant; ++i){
+		overall_lengths_weights[i] = overall_lengths_sum/overall_lengths[i];
+	}
+}
+
+void destroy_overall_lenght_weights(){
+	free(overall_lengths_weights);
 }
 
 // ----------------------------------------------------------------------------
@@ -210,6 +226,7 @@ void init(int argc, char **argv) {
 	towns_count = 0;
 	mi_constant = 0;
 	m_constant = 0;
+	is_dirty = 0;
 
 	// Process execute parameters
 	if (argc == 4) {
@@ -237,6 +254,7 @@ void init(int argc, char **argv) {
 
 	//Each element holds current path length
 	generate_population_overall_length();
+	generate_overall_lenght_weights();
 	find_best();
 
 } // init()
@@ -250,6 +268,7 @@ void terminate() {
 	destroy_weight_matrix();
 	destroy_population();
 	destroy_population_overall_length();
+	destroy_overall_lenght_weights();
 	fprintf(stderr, ".\n");
 	exit(0);
 } // terminate()
@@ -259,39 +278,23 @@ void terminate() {
 void evo_iter(void) {
 	int i,x,y,tmp;
 
-		
+	recalculateRouletteStats();
+
 	//dla wszystkich dzieci
-	for(i = mi_constant; i < M_MI; ++i){
+	for(i = mi_constant; i < M_MI; i+=2){
 		
 		x = getParentRoulette();
 		y = getParentRoulette();
 
 
 		//zrob dziecko
-		pmx(x,y,i,-1);
-		
+		pmx(x,y,i,i+1);
+		mutate(i);
+		mutate(i+1);
+
 		//policz jego odleglosc
 		overall_lengths[i] = calculate_overall_length(i);
-
-		
-		if(overall_lengths[y] > overall_lengths[x]){
-			x = y;
-		}
-
-		//jesli lepsza niz slabszego z rodzicow to zamien
-		if(overall_lengths[i] < overall_lengths[x]){
-			swapRows(population[i],population[x]);
-			//wazne - zmiana sumy
-			overall_lengths_sum -= overall_lengths[x];
-			overall_lengths_sum += overall_lengths[i];
-			
-			swapf(&overall_lengths[i], &overall_lengths[x]);
-
-			//wazne - zmiana najlepszego
-			if(best_value > overall_lengths[x]){
-				best_value = overall_lengths[x];
-				best_index = x;
-			}
-		}
 	}
+
+	qsortPopulation(0,M_MI-1);
 }

@@ -17,7 +17,6 @@ unsigned long global_iteration_counter;
 extern int best_index;
 extern float best_value;
 
-float overall_lengths_sum;
 
 // Parameters from command line
 int towns_count;
@@ -34,3 +33,9 @@ struct town *towns; // []
 int **population; // [][]
 float **weights; // [][]
 float *overall_lengths; // []
+
+
+float *overall_lengths_weights; // []
+float overall_lengths_sum;
+float overall_lengths_weights_sum;
+int is_dirty;
