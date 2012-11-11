@@ -113,7 +113,7 @@ int pmx(int parentA, int parentB, int childA, int childB){
  	}
 
  	for(i = 0; i < towns_count; ++i){
-		if(rand()%10 ==0){
+		if(rand()%8 == 0){
 			r = rand()%towns_count;
 			tmp = newChild[r];
 			newChild[r] = newChild[i];
