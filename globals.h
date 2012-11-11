@@ -11,6 +11,9 @@
 	#define sprintf_s(buffer,size,...) snprintf (buffer,size, __VA_ARGS__)
 #endif
 
+
+#define M_MI (mi_constant+m_constant)
+
 // Global iteration counter
 unsigned long global_iteration_counter;
 

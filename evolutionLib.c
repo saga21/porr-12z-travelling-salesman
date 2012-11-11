@@ -101,16 +101,51 @@ int pmx(int parentA, int parentB, int childA, int childB){
  }
 
  void mutate(int child){
- 	int i,x,a,b,temp,proc;
- 	x = rand()%100;
- 	proc = 15;
- 	if(x <= proc){
- 		for(i = 0; i < rand()%(int)(towns_count*proc/100);++i){
- 			a = rand() % towns_count;
-	 		b = rand() % towns_count;
-			temp = population[child][a];
-			population[child][a] = population[child][b];
-			population[child][b] = temp;
+ 	int i,r,tmp;
+ 	int* newChild;
+ 	float childOverallLength = 0;
+
+ 	newChild = (int*)malloc(sizeof(int)*towns_count);
+ 	memset(newChild,-1,(sizeof(int))*towns_count);
+
+ 	for(i = 0; i < towns_count; ++i){
+	 			newChild[i] = population[child][i];
+ 	}
+
+ 	for(i = 0; i < towns_count; ++i){
+		if(rand()%10 ==0){
+			r = rand()%towns_count;
+			tmp = newChild[r];
+			newChild[r] = newChild[i];
+			newChild[i] = tmp;
+		}
+ 	}
+
+	for(i = 0; i < towns_count-1; i++){	
+		childOverallLength += weights[newChild[i]][newChild[i+1]];
+	}
+ 	
+ 	if(childOverallLength < overall_lengths[child]){
+ 		swapRows(newChild,population[child]);
+ 		overall_lengths[child] = childOverallLength;
+ 	}
+
+ 	free(newChild);
+ }
+
+ void mixinChildren(){
+ 	int i,j,c,r;
+
+ 	c = mi_constant/m_constant;
+
+ 	for(i = mi_constant; i < M_MI; ++i){
+ 		for(j = 0; j<c; ++j){
+ 			r = rand() % mi_constant;
+ 			if(overall_lengths[r]>overall_lengths[i]){
+ 				swapRows(population[r],population[i]);
+ 				swapf(&overall_lengths[r],&overall_lengths[i]);
+ 				break;
+ 			}
  		}
  	}
  }
