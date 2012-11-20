@@ -6,10 +6,10 @@
 #include <float.h> // FLT_MAX
 
 #include "globals.h"
+#include "roulette.h"
 #include "qsortPopulation.h"
 #include "evolutionLib.h"
 #include "evolution.h" // This header
-
 
 // ----------------------------------------------------------------------------
 
@@ -126,6 +126,33 @@ void print_population_info(int force) {
 
 }
 
+void print_summary_info(int verbose) {
+	
+	clock_t time;
+	float ips;
+	float opt;
+
+	time = clock() - global_start_time;
+	
+	if (verbose) {
+		fprintf(stderr, "All iterations %lu in %.1f seconds.\n", 
+			global_iteration_counter, (float)(time) / CLOCKS_PER_SEC);
+	}
+
+	ips = global_iteration_counter / ((float)(time) / CLOCKS_PER_SEC);
+	fprintf(stderr, "Total avarage %6.6f IPS.\n", ips);
+	 
+	if (verbose) {
+		fprintf(stderr, "Best value is: %.2f.\n", best_value);
+		opt = 1.6 * MAX_COORD * sqrt((float)towns_count);
+		fprintf(stderr, "On %.0fx%.0f with %d towns estimated optimal should be: %.2f.\n",
+			MAX_COORD, MAX_COORD, towns_count, opt);
+		fprintf(stderr, "Best value is %.2f percent different estimated optimal (lower is better).\n",
+			(best_value/opt-1)*100);
+	}
+
+}
+
 // ----------------------------------------------------------------------------
 
 void generate_weight_matrix() {
@@ -233,11 +260,13 @@ void init(int argc, char **argv) {
 		m_constant = atoi(argv[3]);
 	}
 	else {
-		fprintf(stderr, "argc: %d\n", argc);
+		fprintf(stderr, "Usage: 'prog towns_count mi m'.\n", argc);
+		fprintf(stderr, "Initializing with default values (%d, %d, %d).\n",
+			DEFAULT_TOWNS, DEFAULT_MI_CONSTANT, DEFAULT_M_CONSTANT);
 	}
-	if (towns_count==0) towns_count = 30;
-	if (mi_constant==0) mi_constant = 1000;
-	if (m_constant==0) m_constant = 10;
+	if (towns_count==0) towns_count = DEFAULT_TOWNS;
+	if (mi_constant==0) mi_constant = DEFAULT_MI_CONSTANT;
+	if (m_constant==0) m_constant = DEFAULT_M_CONSTANT;
 	
 	generate_towns();
 
@@ -260,11 +289,13 @@ void init(int argc, char **argv) {
 // ----------------------------------------------------------------------------
 
 void terminate() {
-	print_population_info(1);
+	print_summary_info(1);
 	fprintf(stderr, "Quiting");
 	destroy_towns();
 	destroy_weight_matrix();
+	fprintf(stderr, ".");
 	destroy_population();
+	fprintf(stderr, ".");
 	destroy_population_overall_length();
 	destroy_overall_lenght_weights();
 	fprintf(stderr, ".\n");
@@ -274,7 +305,7 @@ void terminate() {
 // ----------------------------------------------------------------------------
 
 void evo_iter(void) {
-	int i,x,y,tmp;
+	int i,x,y;
 
 	recalculateRouletteStats();
 

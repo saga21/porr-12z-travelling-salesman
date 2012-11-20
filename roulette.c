@@ -1,6 +1,7 @@
+#include <math.h>
+#include <stdlib.h> // rand
 #include "roulette.h"
 #include "globals.h"
-#include <math.h>
 
 void recalculateRouletteStats(){
 	int i;
@@ -25,7 +26,7 @@ void recalculateLengthsSum(){
 
 
 int getParentRoulette(){
-	int x,i = 0,y;
+	int x,i = 0,y; // 'y' : unreferenced local variable??
 	float sum = 0;
 
 	x = rand() % (int)ceil(overall_lengths_weights_sum);

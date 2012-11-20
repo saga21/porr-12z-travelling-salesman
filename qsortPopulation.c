@@ -1,10 +1,11 @@
 #include "globals.h"
 #include "qsortPopulation.h"
+#include "evolutionLib.h"
 
 
 void qsortPopulation(int l, int r){
 	int pivot,i,j,k;
-	float tmp;
+	//float tmp;
 	int L[2],R[2];
 
 	i = l;

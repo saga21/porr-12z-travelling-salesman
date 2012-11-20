@@ -15,6 +15,7 @@ void generate_population_overall_length();
 void destroy_population_overall_length();
 
 void print_population_info(int force);
+void print_summary_info(int verbose);
 
 void find_best();
 void print_best();

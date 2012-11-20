@@ -78,7 +78,7 @@ void checkDuplicates(int a, int b, int child, int x, int y){
 }
 
 int pmx(int parentA, int parentB, int childA, int childB){
-	int x,y,i;
+	int x,y;
 
 	x = rand() % towns_count;
 	y = rand() % towns_count;

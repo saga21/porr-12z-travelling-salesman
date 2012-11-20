@@ -27,7 +27,7 @@ void draw_best() {
 
 	find_best();
 
-	glColor3f(1.0f, 0.80f, 0.1f);
+	glColor3f(1.0f, 0.8f, 0.2f);
 	glLineWidth(1);
 	glBegin(GL_LINE_LOOP);
 	for(i = 0; i < towns_count; i++) {
@@ -60,12 +60,14 @@ void reshape(int w, int h) {
 // ----------------------------------------------------------------------------
 
 void display(void) {
+	
+	int i;
 
 	// Clean drawing board
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Draw outsite box
-	glColor3f(0.1F, 0.80F, 0.1F);
+	glColor3f(0.1f, 0.8f, 0.1f);
 	glLineWidth(1);
 	glBegin(GL_LINE_LOOP);
 	glVertex2f(-MAX_COORD, -MAX_COORD);
@@ -73,9 +75,20 @@ void display(void) {
 	glVertex2f( MAX_COORD,  MAX_COORD);
 	glVertex2f(-MAX_COORD,  MAX_COORD);
 	glEnd();
-
+	
 	// Draw population
 	draw_best();
+
+	// Draw towns
+	glColor3f(1.0f, 0.2f, 0.2f);
+	for(i = 0; i < towns_count; i++) {
+		glBegin(GL_LINE_LOOP);
+		glVertex2f(towns[i].x+5, towns[i].y+5);
+		glVertex2f(towns[i].x+5, towns[i].y-5);
+		glVertex2f(towns[i].x-5, towns[i].y-5);
+		glVertex2f(towns[i].x-5, towns[i].y+5);
+		glEnd();
+ 	}
 	
 	glutSwapBuffers();
 }
@@ -84,11 +97,18 @@ void display(void) {
 
 void keyboard(unsigned char key_code, int xpos, int ypos) {
 	switch (key_code) {
+		case 'r':
+		case 'R':
 		case 32: // Spacebar
 			display();
 			break;
 		case 'i':
+		case 'I':
 			print_population_info(1);
+			break;
+		case 's':
+		case 'S':
+			print_summary_info(1);
 			break;
 		case 'q':
 		case 'Q':
@@ -102,15 +122,19 @@ void keyboard(unsigned char key_code, int xpos, int ypos) {
 
 void ips_window_title(void) {
 	
-	static clock_t start_time; //TODO: Not initialized
+	static clock_t start_time;
 	static unsigned long iters = 0;
 	
 	float ips;
 	char buf[30];
 	clock_t time;
 	
+	if (iters == 0) {
+		global_start_time = clock();
+	}
+
 	time = clock();
-	
+
 	if (time - start_time >= CLOCKS_PER_SEC) { // one second passed
 		
 		ips = (global_iteration_counter - iters) / ((float)(time - start_time) / CLOCKS_PER_SEC);

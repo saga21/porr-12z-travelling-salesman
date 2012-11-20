@@ -1,5 +1,10 @@
+// Buttons:
+// q/Esc - exit
+// s - print summary
+// i - print best and iteration
+// r/spacebar - draw best
+
 #include <stdlib.h> // srand
-//#include <stdio.h> // printf
 #include <time.h> // time
 
 // GLUT and OpenGL libraries
