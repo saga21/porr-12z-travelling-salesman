@@ -6,9 +6,9 @@
 #define DIM 600
 // Maximum coordinate of town
 #define MAX_COORD 1000.0f
-#define DEFAULT_TOWNS 60
-#define DEFAULT_MI_CONSTANT 500
-#define DEFAULT_M_CONSTANT 500
+#define DEFAULT_TOWNS 100
+#define DEFAULT_MI_CONSTANT 10000
+#define DEFAULT_M_CONSTANT 10000
 
 #ifdef _WIN32
 
@@ -21,6 +21,8 @@
 // Global iteration counter
 unsigned long global_iteration_counter;
 clock_t global_start_time;
+// Minimum main for loop execute time
+extern int global_benchmark;
 
 extern int best_index;
 extern float best_value;

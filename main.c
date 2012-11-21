@@ -6,6 +6,7 @@
 
 #include <stdlib.h> // srand
 #include <time.h> // time
+#include <omp.h>
 
 // GLUT and OpenGL libraries
 #include <GL/glut.h>
@@ -16,8 +17,13 @@
 
 // ----------------------------------------------------------------------------
 
-int main (int argc, char **argv) {	
-	
+int main (int argc, char **argv) {
+
+	// Set dynamic thread count
+	omp_set_dynamic(1);
+	// Set maximum thread count
+	omp_set_num_threads(32);
+
 	srand ( time(NULL) );
 	
 	// Init data

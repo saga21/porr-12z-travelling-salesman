@@ -1,7 +1,7 @@
 #include <stdlib.h> // rand
 #include <stdio.h> // printf
 #include <time.h> // time
-#include <math.h> // sqrt
+#include <math.h> // sqrtf
 #include <string.h>
 #include <float.h> // FLT_MAX
 
@@ -144,13 +144,17 @@ void print_summary_info(int verbose) {
 	 
 	if (verbose) {
 		fprintf(stderr, "Best value is: %.2f.\n", best_value);
-		opt = 1.6 * MAX_COORD * sqrt((float)towns_count);
+		opt = 1.6f * MAX_COORD * sqrtf((float)towns_count);
 		fprintf(stderr, "On %.0fx%.0f with %d towns estimated optimal should be: %.2f.\n",
 			MAX_COORD, MAX_COORD, towns_count, opt);
 		fprintf(stderr, "Best value is %.2f percent different estimated optimal (lower is better).\n",
 			(best_value/opt-1)*100);
 	}
-
+	
+	// i3@2.5GHz Towns=100, MI=10000, M=10000
+	// Seq Debug ~134 Release ~96
+	// OMP Debug ~50  Release ~35
+	fprintf(stderr, "Minimum execution time for loop in evo_iter: %d ms\n", global_benchmark);
 }
 
 // ----------------------------------------------------------------------------
@@ -260,7 +264,7 @@ void init(int argc, char **argv) {
 		m_constant = atoi(argv[3]);
 	}
 	else {
-		fprintf(stderr, "Usage: 'prog towns_count mi m'.\n", argc);
+		fprintf(stderr, "Usage: 'prog towns_count mi m'.\n");
 		fprintf(stderr, "Initializing with default values (%d, %d, %d).\n",
 			DEFAULT_TOWNS, DEFAULT_MI_CONSTANT, DEFAULT_M_CONSTANT);
 	}
@@ -305,19 +309,24 @@ void terminate() {
 // ----------------------------------------------------------------------------
 
 void evo_iter(void) {
+	
 	int i,x,y;
-
+	clock_t timer;
+	
 	recalculateRouletteStats();
-
+	
+	timer = clock();
+	
 	//dla wszystkich dzieci
+#pragma omp parallel for private (i, x, y)
 	for(i = mi_constant; i < M_MI; i+=2){
 		
 		x = getParentRoulette();
 		y = getParentRoulette();
-
-
+		
 		//zrob dziecko
-		pmx(x,y,i,i+1);
+		pmx(x, y, i, i+1);
+	
 		mutate(i);
 		mutate(i+1);
 
@@ -325,6 +334,12 @@ void evo_iter(void) {
 		overall_lengths[i] = calculate_overall_length(i);
 	}
 
+	timer = clock() - timer;
+
 	mixinChildren();
+
+	if (global_benchmark > timer)
+		global_benchmark = timer;
+
 	//qsortPopulation(0,M_MI-1);
 }
