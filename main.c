@@ -22,7 +22,7 @@ int main (int argc, char **argv) {
 	// Set dynamic thread count
 	omp_set_dynamic(1);
 	// Set maximum thread count
-	omp_set_num_threads(32);
+	omp_set_num_threads(THREAD_COUNT);
 
 	srand ( time(NULL) );
 	

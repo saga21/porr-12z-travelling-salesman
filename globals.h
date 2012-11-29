@@ -1,7 +1,5 @@
 #pragma once
 
-#include <time.h>
-
 // Default dimension of OpenGL Window
 #define DIM 600
 // Maximum coordinate of town
@@ -9,9 +7,10 @@
 #define DEFAULT_TOWNS 100
 #define DEFAULT_MI_CONSTANT 10000
 #define DEFAULT_M_CONSTANT 10000
+#define THREAD_COUNT 4
 
 #ifdef _WIN32
-
+	
 #else
 	#define sprintf_s(buffer,size,...) snprintf (buffer,size, __VA_ARGS__)
 #endif
@@ -20,7 +19,7 @@
 
 // Global iteration counter
 unsigned long global_iteration_counter;
-clock_t global_start_time;
+long global_start_time;
 // Minimum main for loop execute time
 extern int global_benchmark;
 
@@ -47,3 +46,5 @@ float *overall_lengths_weights; // []
 float overall_lengths_sum;
 float overall_lengths_weights_sum;
 int is_dirty;
+
+long clock_ms();

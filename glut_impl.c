@@ -1,6 +1,5 @@
 #include <stdio.h> // printf
 #include <string.h> // strlen
-#include <time.h>
 // GLUT and OpenGL libraries
 #include <GL/glut.h>
 #include <GL/gl.h>
@@ -120,24 +119,24 @@ void keyboard(unsigned char key_code, int xpos, int ypos) {
 // ----------------------------------------------------------------------------
 
 void ips_window_title(void) {
-	
-	static clock_t start_time;
+
+	static long start_time = 0;
 	static unsigned long iters = 0;
 	
+	long time;
 	float ips;
 	char buf[30];
-	clock_t time;
 	
 	if (iters == 0) {
-		global_start_time = clock();
+		global_start_time = clock_ms();
 	}
 
-	time = clock();
+	time = clock_ms();
 
-	if (time - start_time >= CLOCKS_PER_SEC) { // one second passed
+	if (time - start_time >= 1000) { // one second passed
 		
-		ips = (global_iteration_counter - iters) / ((float)(time - start_time) / CLOCKS_PER_SEC);
-		sprintf_s(buf, 30, "Evo-salesman %6.0f IPS", ips);
+		ips = (float)(global_iteration_counter - iters) / (time - start_time) * 1000;
+		sprintf_s(buf, 30, "Evo-salesman %6.2f IPS", ips);
 		start_time = time;
 		iters = global_iteration_counter;
 		glutSetWindowTitle(buf);

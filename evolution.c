@@ -1,6 +1,5 @@
 #include <stdlib.h> // rand
 #include <stdio.h> // printf
-#include <time.h> // time
 #include <math.h> // sqrtf
 #include <string.h>
 #include <float.h> // FLT_MAX
@@ -119,6 +118,9 @@ void print_population_info(int force) {
 
 	static float prev_best_value = FLT_MAX;
 
+	// TODO remove this line after best is always valid
+	//find_best();
+
 	if (force || prev_best_value != best_value) {
 		fprintf(stderr, "Iter %lu: %f\n", global_iteration_counter, best_value);
 		prev_best_value = best_value;
@@ -128,19 +130,21 @@ void print_population_info(int force) {
 
 void print_summary_info(int verbose) {
 	
-	clock_t time;
+	float time;
 	float ips;
 	float opt;
 
-	time = clock() - global_start_time;
+	// Time in seconds
+	time = (float)(clock_ms() - global_start_time) / 1000;
 	
 	if (verbose) {
-		fprintf(stderr, "All iterations %lu in %.1f seconds.\n", 
-			global_iteration_counter, (float)(time) / CLOCKS_PER_SEC);
+		fprintf(stderr, "All iterations %lu in %.2f seconds.\n", 
+			global_iteration_counter, time );
 	}
 
-	ips = global_iteration_counter / ((float)(time) / CLOCKS_PER_SEC);
-	fprintf(stderr, "Total avarage %6.6f IPS.\n", ips);
+	ips = (float)global_iteration_counter / time;
+
+	fprintf(stderr, "Total avarage %.4f IPS.\n", ips);
 	 
 	if (verbose) {
 		fprintf(stderr, "Best value is: %.2f.\n", best_value);
@@ -151,9 +155,6 @@ void print_summary_info(int verbose) {
 			(best_value/opt-1)*100);
 	}
 	
-	// i3@2.5GHz Towns=100, MI=10000, M=10000
-	// Seq Debug ~134 Release ~96
-	// OMP Debug ~50  Release ~35
 	fprintf(stderr, "Minimum execution time for loop in evo_iter: %d ms\n", global_benchmark);
 }
 
@@ -311,11 +312,11 @@ void terminate() {
 void evo_iter(void) {
 	
 	int i,x,y;
-	clock_t timer;
+	long timer;
 	
 	recalculateRouletteStats();
 	
-	timer = clock();
+	timer = clock_ms();
 	
 	//dla wszystkich dzieci
 #pragma omp parallel for private (i, x, y)
@@ -332,10 +333,11 @@ void evo_iter(void) {
 
 		//policz jego odleglosc
 		overall_lengths[i] = calculate_overall_length(i);
+		overall_lengths[i+1] = calculate_overall_length(i+1);
 	}
 
-	timer = clock() - timer;
-
+	timer = clock_ms() - timer;
+	
 	mixinChildren();
 
 	if (global_benchmark > timer)
