@@ -181,11 +181,11 @@ int pmx(int parentA, int parentB, int childA, int childB, unsigned *seed){
 }
 
 void mutate_remove_crossover(int child, unsigned *seed){
-	int a,b,i, length1, length2, tmp;
+	int a,b,i, tmp;
 
  	for(i = 0; i < 10; ++i){
- 		a = rand_r(seed) % (towns_count - 10);
-		while((b = rand_r(seed) % towns_count) == a || b+1 == a || b-1 == a){}
+ 		a = rand_my(seed) % (towns_count - 10);
+		while((b = rand_my(seed) % towns_count) == a || b+1 == a || b-1 == a){}
  		
  		if(a > b){
  			tmp = a; a = b; b = tmp;
