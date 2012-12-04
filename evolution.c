@@ -339,7 +339,7 @@ void evo_iter(void) {
 			//mutate(i,&seed);
 			//mutate_reverse(i+1,&seed);
 			//mutate(i+1,&seed);
-			
+		
 			switch(rand_my(&seed)%4){
 				case 0:
 					mutate_reverse_swap(i,&seed);
@@ -350,10 +350,18 @@ void evo_iter(void) {
 					mutate_swap_neighbours(i+1,&seed);
 				break;
 				case 2:
-					mutate_reverse_swap(i,&seed);
-					mutate_reverse_swap(i+1,&seed);
+					mutate_remove_crossover(i,&seed);
+					mutate_remove_crossover(i+1,&seed);
 				break;
 				case 3: 
+					mutate_remove_crossover(i,&seed);
+					mutate_remove_crossover(i+1,&seed);
+				break;
+				case 4: 
+					mutate_swap_neighbours(i,&seed);
+					mutate_swap_neighbours(i+1,&seed);
+				break;
+				case 5: 
 					mutate_random(i, &seed);
 					mutate_random(i+1, &seed);
 				break;				

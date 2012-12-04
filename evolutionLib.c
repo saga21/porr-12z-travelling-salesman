@@ -180,6 +180,40 @@ int pmx(int parentA, int parentB, int childA, int childB, unsigned *seed){
 	}
 }
 
+void mutate_remove_crossover(int child, unsigned *seed){
+	int a,b,i, length1, length2, tmp;
+
+ 	for(i = 0; i < 10; ++i){
+ 		a = rand_r(seed) % (towns_count - 10);
+		while((b = rand_r(seed) % towns_count) == a || b+1 == a || b-1 == a){}
+ 		
+ 		if(a > b){
+ 			tmp = a; a = b; b = tmp;
+ 		}
+
+	 	if(is_crossing(a, a+1, b-1, b)){
+	 		++a; --b;
+	 		while(a < b){
+	 			tmp = population[child][a];
+	 			population[child][a] = population[child][b];
+	 			population[child][b] = tmp;
+	 			++a; --b;
+	 		}
+	 	}
+	}
+}
+
+int is_crossing(int a, int b, int i, int j){
+	float c[4];
+	c[0] = (towns[a].x - towns[b].x)*(towns[i].y - towns[a].y) - (towns[a].y - towns[b].y)*(towns[i].x - towns[a].x);
+	c[1] = (towns[a].x - towns[b].x)*(towns[j].y - towns[a].y) - (towns[a].y - towns[b].y)*(towns[j].x - towns[a].x); 
+	c[2] = (towns[i].x - towns[j].x)*(towns[a].y - towns[i].y) - (towns[i].y - towns[j].y)*(towns[a].x - towns[i].x); 
+	c[3] = (towns[i].x - towns[j].x)*(towns[b].y - towns[i].y) - (towns[i].y - towns[j].y)*(towns[b].x - towns[i].x); 
+
+	return ((c[0]*c[1] < 0) && (c[2]*c[3] < 0));
+
+}
+
 
 
  void mixinChildren(){
