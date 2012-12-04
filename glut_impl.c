@@ -157,7 +157,7 @@ void idle(void) {
 
 	// Every n'th iteration
 	// TODO Change 100 to parameter
-	if (global_iteration_counter%100 == 0) {
+	if (global_iteration_counter%500 == 0) {
 		// Update main and sub window
 		glutPostRedisplay(); //display();
 		// Force to print population info

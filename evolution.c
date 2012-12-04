@@ -313,27 +313,55 @@ void evo_iter(void) {
 	
 	int i,x,y;
 	long timer;
+	unsigned seed;
 	
 	recalculateRouletteStats();
 	
 	timer = clock_ms();
 	
 	//dla wszystkich dzieci
-#pragma omp parallel for private (i, x, y)
-	for(i = mi_constant; i < M_MI; i+=2){
-		
-		x = getParentRoulette();
-		y = getParentRoulette();
-		
-		//zrob dziecko
-		pmx(x, y, i, i+1);
-	
-		mutate(i);
-		mutate(i+1);
+	#pragma omp parallel private(seed)
+	{
 
-		//policz jego odleglosc
-		overall_lengths[i] = calculate_overall_length(i);
-		overall_lengths[i+1] = calculate_overall_length(i+1);
+		seed = 25234 + 17*omp_get_thread_num() + global_iteration_counter;
+
+		#pragma omp for private (i, x, y)
+		for(i = mi_constant; i < M_MI; i+=2){
+			
+			x = getParentRoulette(&seed);
+			y = getParentRoulette(&seed);
+			
+			//zrob dziecko
+			pmx(x, y, i, i+1,&seed);
+
+			//mutate_reverse(i,&seed);
+			//mutate(i,&seed);
+			//mutate_reverse(i+1,&seed);
+			//mutate(i+1,&seed);
+			
+			switch(rand_r(&seed)%4){
+				case 0:
+					mutate_reverse_swap(i,&seed);
+					mutate_reverse_swap(i+1,&seed);
+				break;
+				case 1:
+					mutate_swap_neighbours(i,&seed);
+					mutate_swap_neighbours(i+1,&seed);
+				break;
+				case 2:
+					mutate_reverse_swap(i,&seed);
+					mutate_reverse_swap(i+1,&seed);
+				break;
+				case 3: 
+					mutate_random(i, &seed);
+					mutate_random(i+1, &seed);
+				break;				
+			}
+		
+			//policz jego odleglosc
+			overall_lengths[i] = calculate_overall_length(i);
+			overall_lengths[i+1] = calculate_overall_length(i+1);
+		}
 	}
 
 	timer = clock_ms() - timer;

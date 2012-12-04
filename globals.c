@@ -11,7 +11,7 @@ long clock_ms()
 #ifdef _WIN32
 	return (long)(clock() * 1000 / CLOCKS_PER_SEC);
 #else
-	timespec ts;
+	struct timespec ts;
 	clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
 	return (long)(ts.tv_sec * 1000.0f + ts.tv_nsec / 1000.0f);
 #endif

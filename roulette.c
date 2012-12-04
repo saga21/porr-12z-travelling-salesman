@@ -25,11 +25,11 @@ void recalculateLengthsSum(){
 }
 
 
-int getParentRoulette(){
+int getParentRoulette(unsigned *seed){
 	int x,i = 0,y; // 'y' : unreferenced local variable??
 	float sum = 0;
 
-	x = rand() % (int)ceil(overall_lengths_weights_sum);
+	x = rand_r(seed) % (int)ceil(overall_lengths_weights_sum);
 	
 	//TO DO jest rozjazd miedzy trzymana suma a faktyczna - tylko czemu?
 	// for(y = 0; y < mi_constant; ++y){
