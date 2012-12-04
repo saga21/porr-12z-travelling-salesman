@@ -48,3 +48,4 @@ float overall_lengths_weights_sum;
 int is_dirty;
 
 long clock_ms();
+int rand_my(unsigned int* seed);

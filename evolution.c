@@ -3,6 +3,7 @@
 #include <math.h> // sqrtf
 #include <string.h>
 #include <float.h> // FLT_MAX
+#include <omp.h> // omp_get_thread_num
 
 #include "globals.h"
 #include "roulette.h"
@@ -339,7 +340,7 @@ void evo_iter(void) {
 			//mutate_reverse(i+1,&seed);
 			//mutate(i+1,&seed);
 			
-			switch(rand_r(&seed)%4){
+			switch(rand_my(&seed)%4){
 				case 0:
 					mutate_reverse_swap(i,&seed);
 					mutate_reverse_swap(i+1,&seed);

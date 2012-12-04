@@ -1,7 +1,8 @@
-#include <math.h>
-#include <stdlib.h> // rand
+#include <math.h> // ceil
+#include <stdlib.h> // free
 #include "roulette.h"
 #include "globals.h"
+
 
 void recalculateRouletteStats(){
 	int i;
@@ -26,10 +27,10 @@ void recalculateLengthsSum(){
 
 
 int getParentRoulette(unsigned *seed){
-	int x,i = 0,y; // 'y' : unreferenced local variable??
+	int x, i = 0;
 	float sum = 0;
-
-	x = rand_r(seed) % (int)ceil(overall_lengths_weights_sum);
+	
+	x = rand_my(seed) % (int)ceil(overall_lengths_weights_sum);
 	
 	//TO DO jest rozjazd miedzy trzymana suma a faktyczna - tylko czemu?
 	// for(y = 0; y < mi_constant; ++y){

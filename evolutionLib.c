@@ -80,8 +80,8 @@ void checkDuplicates(int a, int b, int child, int x, int y){
 int pmx(int parentA, int parentB, int childA, int childB, unsigned *seed){
 	int x,y;
 
-	x = rand_r(seed) % towns_count;
-	y = rand_r(seed) % towns_count;
+	x = rand_my(seed) % towns_count;
+	y = rand_my(seed) % towns_count;
 
 	if(x>y){
 		swap(&x,&y);
@@ -113,8 +113,8 @@ int pmx(int parentA, int parentB, int childA, int childB, unsigned *seed){
  	}
 
  	for(i = 0; i < towns_count; ++i){
-		if(rand_r(seed)%8 == 0){
-			r = rand_r(seed)%towns_count;
+		if(rand_my(seed)%8 == 0){
+			r = rand_my(seed)%towns_count;
 			tmp = newChild[r];
 			newChild[r] = newChild[i];
 			newChild[i] = tmp;
@@ -134,12 +134,12 @@ int pmx(int parentA, int parentB, int childA, int childB, unsigned *seed){
  }
 
   void mutate_swap_neighbours(int child, unsigned* seed){
- 	int a,i, orig_length, new_length, tmp;
-
+ 	int a,i, tmp;
+	float orig_length, new_length;
  	for(i = 0; i < 20; ++i){
- 		a = rand_r(seed) % (towns_count - 3);
+ 		a = rand_my(seed) % (towns_count - 3);
 	 	a += 1;
-	 	orig_length = weights[population[child][a-1]][population[child][a]] +
+		orig_length = weights[population[child][a-1]][population[child][a]] +
 	 		weights[population[child][a+1]][population[child][a+2]];
 	 	new_length = weights[population[child][a-1]][population[child][a+1]] +
 	 		weights[population[child][a]][population[child][a+2]];
@@ -153,11 +153,12 @@ int pmx(int parentA, int parentB, int childA, int childB, unsigned *seed){
   }
 
  void mutate_reverse_swap(int child, unsigned* seed){
- 	int a,b,i, orig_length, new_length, tmp;
+ 	int a,b,i, tmp;
+	float orig_length, new_length;
 
  	for(i = 0; i < 20; ++i){
- 		a = rand_r(seed) % (towns_count - 10);
-		while((b = rand_r(seed) % towns_count) == a || b+1 == a || b-1 == a){}
+ 		a = rand_my(seed) % (towns_count - 10);
+		while((b = rand_my(seed) % towns_count) == a || b+1 == a || b-1 == a){}
  		
  		if(a > b){
  			tmp = a; a = b; b = tmp;
