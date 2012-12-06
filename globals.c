@@ -11,7 +11,6 @@ int best_index = 0;
 float best_value = FLT_MAX;
 int global_benchmark = INT_MAX;
 
-// TODO: Make these functions inline
 long clock_ms()
 {
 #ifdef _WIN32
