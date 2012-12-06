@@ -9,11 +9,8 @@
 #include <omp.h>
 
 // GLUT and OpenGL libraries
-#include <GL/glut.h>
-#include <GL/gl.h>
 #include "globals.h" // DIM, ...
 #include "evolution.h" // init
-#include "glut_impl.h" // display, reshape, ...
 
 // ----------------------------------------------------------------------------
 
@@ -28,23 +25,20 @@ int main (int argc, char **argv) {
 	
 	// Init data
 	init(argc, argv);
-
-	// Glut initializations
-	glutInit (&argc, argv);
-	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowPosition (100, 100);
-	glutInitWindowSize (DIM, DIM);
-
-	// Main window creation and setup
-	glutCreateWindow ("Evo-salesman");
-	glutDisplayFunc    (display);
-	glutReshapeFunc   (reshape);
-	glutKeyboardFunc (keyboard);
-	glutIdleFunc         (idle);
 	
-	//fprintf(stderr, "Init success\n");
+	while(true) {
+		// Compute next generation
+		evo_iter();
+		
+		// Increase counter
+		++global_iteration_counter;
 
-	glutMainLoop();
+		// Every n'th iteration
+		if (global_iteration_counter%500 == 0) {
+			// Force to print population info
+			print_summary_info(1);
+		}
+	}
 
 	return 0;
 }
