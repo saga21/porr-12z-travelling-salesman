@@ -151,15 +151,12 @@ void idle(void) {
 
 	// Compute next generation
 	evo_iter();
-
 	// Increase counter
 	++global_iteration_counter;
 
 	// Every n'th iteration
 	// TODO Change 100 to parameter
-	if (global_iteration_counter%500 == 0) {
-		// Update main and sub window
-		glutPostRedisplay(); //display();
+	if (global_iteration_counter%100 == 0) {
 		// Force to print population info
 		print_population_info(1);
 	}
