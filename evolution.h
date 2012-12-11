@@ -17,7 +17,7 @@ void destroy_population_overall_length();
 void print_population_info(int force);
 void print_summary_info(int verbose);
 
-void find_best();
+float find_best();
 void print_best();
 
 void evo_iter(void);

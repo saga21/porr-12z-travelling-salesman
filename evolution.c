@@ -4,6 +4,8 @@
 #include <string.h>
 #include <float.h> // FLT_MAX
 #include <omp.h> // omp_get_thread_num
+#include <GL/glut.h>
+#include <GL/gl.h>
 
 #include "globals.h"
 #include "roulette.h"
@@ -71,7 +73,7 @@ float calculate_overall_length(int index) {
 
 // ----------------------------------------------------------------------------
 
-void find_best(){
+float find_best(){
 	int i;
 	best_value = FLT_MAX;
 
@@ -81,6 +83,7 @@ void find_best(){
 			best_index = i;
 		} 
 	}
+	return best_value;
 }
 
 // ----------------------------------------------------------------------------
@@ -120,11 +123,14 @@ void print_population_info(int force) {
 	static float prev_best_value = FLT_MAX;
 
 	// TODO remove this line after best is always valid
-	//find_best();
+	find_best();
 
 	if (force || prev_best_value != best_value) {
 		fprintf(stderr, "Iter %lu: %f\n", global_iteration_counter, best_value);
 		prev_best_value = best_value;
+		
+		// Update main and sub window
+		glutPostRedisplay(); //display();
 	}
 
 }
@@ -257,22 +263,25 @@ void init(int argc, char **argv) {
 	towns_count = 0;
 	mi_constant = 0;
 	m_constant = 0;
+	thread_count = 0;
 	is_dirty = 0;
 
 	// Process execute parameters
-	if (argc == 4) {
+	if (argc == 5) {
 		towns_count = atoi(argv[1]);
 		mi_constant = atoi(argv[2]);
 		m_constant = atoi(argv[3]);
+		thread_count = atoi(argv[4]);
 	}
 	else {
-		fprintf(stderr, "Usage: 'prog towns_count mi m'.\n");
-		fprintf(stderr, "Initializing with default values (%d, %d, %d).\n",
-			DEFAULT_TOWNS, DEFAULT_MI_CONSTANT, DEFAULT_M_CONSTANT);
+		fprintf(stderr, "Usage: 'prog towns_count mi m thread_count'.\n");
+		fprintf(stderr, "Initializing with default values (%d, %d, %d, %d).\n",
+			DEFAULT_TOWNS, DEFAULT_MI_CONSTANT, DEFAULT_M_CONSTANT, DEFAULT_THREAD_COUNT);
 	}
 	if (towns_count==0) towns_count = DEFAULT_TOWNS;
 	if (mi_constant==0) mi_constant = DEFAULT_MI_CONSTANT;
 	if (m_constant==0) m_constant = DEFAULT_M_CONSTANT;
+	if (thread_count==0) thread_count = DEFAULT_THREAD_COUNT;
 	
 	generate_towns();
 

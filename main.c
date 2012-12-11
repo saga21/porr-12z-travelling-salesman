@@ -19,15 +19,15 @@
 
 int main (int argc, char **argv) {
 
-	// Set dynamic thread count
-	omp_set_dynamic(1);
-	// Set maximum thread count
-	omp_set_num_threads(THREAD_COUNT);
-
 	srand ( time(NULL) );
 	
 	// Init data
 	init(argc, argv);
+	
+	// Set dynamic thread count
+	omp_set_dynamic(1);
+	// Set maximum thread count
+	omp_set_num_threads(thread_count);
 
 	// Glut initializations
 	glutInit (&argc, argv);

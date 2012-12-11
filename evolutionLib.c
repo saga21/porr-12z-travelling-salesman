@@ -87,10 +87,10 @@ int pmx(int parentA, int parentB, int childA, int childB, unsigned *seed){
 		swap(&x,&y);
 	}
 
-	//printf("x: %d , y: %d\n",x,y);
+	//printf("parA: %d, parB: %d, childA: %d, x: %d, y: %d\n", parentA, parentB, childA, x, y);
 	
-	prepareChild(parentA,parentB,childA,x,y);
-	checkDuplicates(parentA,parentB,childA,x,y);
+	prepareChild(parentA, parentB, childA, x, y);
+	checkDuplicates(parentA, parentB, childA, x, y);
 
 	if(childB >= 0){
 		prepareChild(parentB,parentA,childB,x,y);
