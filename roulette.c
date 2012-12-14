@@ -32,7 +32,7 @@ int getParentRoulette(unsigned *seed){
 	
 	x = rand_my(seed) % (int)ceil(overall_lengths_weights_sum);
 	
-	//TO DO jest rozjazd miedzy trzymana suma a faktyczna - tylko czemu?
+	//TODO jest rozjazd miedzy trzymana suma a faktyczna - tylko czemu?
 	// for(y = 0; y < mi_constant; ++y){
 	// 	sum += overall_lengths[y];
 	// }
