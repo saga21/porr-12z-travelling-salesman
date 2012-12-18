@@ -6,13 +6,12 @@
 #define NEXT_NODE (node+1)%node_count
 #define PREV_NODE (node+node_count-1)%node_count
 
-
 //tutaj przesyłam tablicę jednowymiarową, aby przesłać dwuwymiarową można zrobić tak: http://stackoverflow.com/questions/5901476/sending-and-receiving-2d-array-over-mpi
 //instalację mpi wziąłem z http://www.mpich.org/ jest też wersja na windowsa :)
 //nie wiem ja kna windzie ale na debianie kompilacja:  mpicc main.c  -o main
 //uruchamianie mpiexec -n 4 ./main
 //musiałem odpalić jeszcze coś ale postępowałme wg komunikatów które wyskoczyły
-
+// C8GX-FT9WTCLT 
 int main(int argc, char **argv)
 {
 	int i,node, node_count,sum = 0,flag;

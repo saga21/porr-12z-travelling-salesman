@@ -3,7 +3,12 @@
 #include <math.h> // sqrtf
 #include <string.h>
 #include <float.h> // FLT_MAX
+#ifdef USE_OMP
 #include <omp.h> // omp_get_thread_num
+#endif
+#ifdef USE_MPI
+#include <mpi.h>
+#endif
 #include <GL/glut.h>
 #include <GL/gl.h>
 
@@ -310,9 +315,12 @@ void terminate() {
 	destroy_weight_matrix();
 	fprintf(stderr, ".");
 	destroy_population();
-	fprintf(stderr, ".");
 	destroy_population_overall_length();
 	destroy_overall_lenght_weights();
+	fprintf(stderr, ".");
+#ifdef USE_MPI
+	MPI_Finalize();
+#endif
 	fprintf(stderr, ".\n");
 	exit(0);
 } // terminate()
@@ -329,13 +337,22 @@ void evo_iter(void) {
 	
 	timer = clock_ms();
 	
+#ifdef USE_OMP
 	//dla wszystkich dzieci
 	#pragma omp parallel private(seed)
+#endif
+
 	{
+
+#ifdef USE_OMP
 
 		seed = 25234 + 17*omp_get_thread_num() + global_iteration_counter;
 
 		#pragma omp for private (i, x, y)
+#else
+		seed = 25234 + global_iteration_counter;
+#endif
+
 		for(i = mi_constant; i < M_MI; i+=2){
 			
 			x = getParentRoulette(&seed);

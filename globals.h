@@ -9,6 +9,9 @@
 #define DEFAULT_M_CONSTANT 5000
 #define DEFAULT_THREAD_COUNT 2
 
+#define PRINT_EVERY_ITERS 100
+#define TRANSFER_COUNT 5
+
 #ifdef _WIN32
 	
 #else
@@ -16,6 +19,11 @@
 #endif
 
 #define M_MI (mi_constant+m_constant)
+
+#ifdef USE_MPI
+int mpi_node_id;
+int mpi_node_count;
+#endif
 
 // Global iteration counter
 unsigned long global_iteration_counter;
