@@ -187,15 +187,15 @@ void idle(void) {
 
 	//******** Sending ********//
 	// If not sending to itself
-	if (mpi_node_id != MPI_NEXT_NODE && rand_my(0)%SEND_EVERY_ITER==0) {
-
+	if (mpi_node_id != MPI_NEXT_NODE && (rand_my(0)%SEND_EVERY_ITER)==0) {
+		
 		// Alloc buffer
 		cities_array = (int*)malloc(TRANSFER_COUNT * towns_count * sizeof(int));
 		
 		// TODO: Prepare cities_array to send from best of population
-		cities_array[0] = 12;
-		cities_array[1] = 45;
-		cities_array[2] = 78;
+		cities_array[0] = 123456789;
+		cities_array[1] = mpi_node_id;
+		cities_array[2] = rand_my(0)%10;
 
 		// Debug what we send
 		printf("Node %d sending (to next %d) buffer: %d, %d, %d ...\n", 
