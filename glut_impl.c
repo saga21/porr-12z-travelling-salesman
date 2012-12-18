@@ -1,8 +1,18 @@
 #include <stdio.h> // printf
 #include <string.h> // strlen
+#include <stdlib.h> // malloc?
 // GLUT and OpenGL libraries
 #include <GL/glut.h>
 #include <GL/gl.h>
+#define USE_MPI 1
+
+#include <Windows.h>
+#ifdef USE_MPI
+#include <mpi.h>
+
+#define MPI_NEXT_NODE (mpi_node_id+1)%mpi_node_count
+#define MPI_PREV_NODE (mpi_node_id+mpi_node_count-1)%mpi_node_count
+#endif
 
 #include "globals.h" // MAX_COORD
 #include "evolution.h" // evo_iter, print_population_info
@@ -148,6 +158,12 @@ void ips_window_title(void) {
 // ----------------------------------------------------------------------------
 
 void idle(void) {
+	
+#ifdef USE_MPI
+	int *cities_array;
+	int recv_flag;
+	MPI_Status status;
+#endif
 
 	// Compute next generation
 	evo_iter();
@@ -155,8 +171,7 @@ void idle(void) {
 	++global_iteration_counter;
 
 	// Every n'th iteration
-	// TODO Change 100 to parameter
-	if (global_iteration_counter%100 == 0) {
+	if (global_iteration_counter%PRINT_EVERY_ITERS == 0) {
 		// Force to print population info
 		print_population_info(1);
 	}
@@ -167,6 +182,54 @@ void idle(void) {
 
 	// Iterations per second
 	ips_window_title();
+
+#ifdef USE_MPI
+
+	//******** Sending ********//
+	// If not sending to itself
+	if (mpi_node_id != MPI_NEXT_NODE && rand_my(0)%5==1) {
+
+		// Alloc buffer
+		cities_array = (int*)malloc(TRANSFER_COUNT * towns_count * sizeof(int));
+		
+		// TODO: Prepare cities_array to send from best of population
+		cities_array[0] = 12;
+		cities_array[1] = 45;
+		cities_array[2] = 78;
+
+		// Debug what we send
+		printf("Node %d sending (to next %d) buffer: %d, %d, %d ...\n", 
+			mpi_node_id, MPI_NEXT_NODE, cities_array[0], cities_array[1], cities_array[2]);
+		
+		// Blocking sending
+		MPI_Send((void*)cities_array, TRANSFER_COUNT * towns_count, MPI_INT, MPI_NEXT_NODE, 0, MPI_COMM_WORLD);
+
+		// Free buffer
+		free(cities_array);
+	}
+	
+	//******** Receiving ********//
+	// Test if can receive message
+	MPI_Iprobe(MPI_PREV_NODE, 0, MPI_COMM_WORLD, &recv_flag, &status);
+	// If can receive
+	if (recv_flag) {
+
+		// Alloc buffer
+		cities_array = (int*)malloc(TRANSFER_COUNT * towns_count * sizeof(int));
+
+		// Blocking receive
+		MPI_Recv((void*)cities_array, TRANSFER_COUNT * towns_count, MPI_INT, MPI_PREV_NODE, 0, MPI_COMM_WORLD, &status);
+
+		// Print what've received
+		printf("Node %d received (from prev: %d) buffer: %d, %d, %d ...\n",
+			mpi_node_id, MPI_PREV_NODE, cities_array[0], cities_array[1], cities_array[2]);
+	
+		//TODO: Insert to population data from received cities_array
+
+		// Free buffer
+		free(cities_array);
+	}
+#endif
 }
 
 // ----------------------------------------------------------------------------
