@@ -4,12 +4,12 @@
 // GLUT and OpenGL libraries
 #include <GL/glut.h>
 #include <GL/gl.h>
+
+// TODO: Dlaczego musze jeszcze raz uzyc define, skoro jest juz w main?
 #define USE_MPI 1
 
-#include <Windows.h>
 #ifdef USE_MPI
 #include <mpi.h>
-
 #define MPI_NEXT_NODE (mpi_node_id+1)%mpi_node_count
 #define MPI_PREV_NODE (mpi_node_id+mpi_node_count-1)%mpi_node_count
 #endif
@@ -187,7 +187,7 @@ void idle(void) {
 
 	//******** Sending ********//
 	// If not sending to itself
-	if (mpi_node_id != MPI_NEXT_NODE && rand_my(0)%5==1) {
+	if (mpi_node_id != MPI_NEXT_NODE && rand_my(0)%SEND_EVERY_ITER==0) {
 
 		// Alloc buffer
 		cities_array = (int*)malloc(TRANSFER_COUNT * towns_count * sizeof(int));
