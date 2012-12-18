@@ -1,16 +1,17 @@
 #pragma once
 
 // Default dimension of OpenGL Window
-#define DIM 600
+#define DIM ( 600 )
 // Maximum coordinate of town
-#define MAX_COORD 1000.0f
-#define DEFAULT_TOWNS 50
-#define DEFAULT_MI_CONSTANT 5000
-#define DEFAULT_M_CONSTANT 5000
-#define DEFAULT_THREAD_COUNT 2
+#define MAX_COORD ( 1000.0f )
+#define DEFAULT_TOWNS ( 50 )
+#define DEFAULT_MI_CONSTANT ( 5000 )
+#define DEFAULT_M_CONSTANT ( 5000 )
+#define DEFAULT_THREAD_COUNT ( 2 )
 
-#define PRINT_EVERY_ITERS 100
-#define TRANSFER_COUNT 5
+#define PRINT_EVERY_ITERS ( 100 )
+#define TRANSFER_COUNT ( 5 )
+#define SEND_EVERY_ITER ( 500 )
 
 #ifdef _WIN32
 	
