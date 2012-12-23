@@ -28,9 +28,7 @@
 int main (int argc, char **argv) {
 
 	srand ( time(NULL) );
-	
-	// Init data
-	init(argc, argv);
+
 #ifdef USE_OMP	
 	// Set dynamic thread count
 	omp_set_dynamic(1);
@@ -44,7 +42,12 @@ int main (int argc, char **argv) {
 	//pobierz id i iloœæ zadañ
 	MPI_Comm_rank(MPI_COMM_WORLD, &mpi_node_id);
 	MPI_Comm_size(MPI_COMM_WORLD, &mpi_node_count);
+
 #endif
+	
+	// Init data
+	init(argc, argv);
+
 	// Glut initializations
 	glutInit (&argc, argv);
 	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGBA);
