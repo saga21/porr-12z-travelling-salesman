@@ -10,8 +10,8 @@
 
 #ifdef USE_MPI
 #include <mpi.h>
-#define MPI_NEXT_NODE (mpi_node_id+1)%mpi_node_count
-#define MPI_PREV_NODE (mpi_node_id+mpi_node_count-1)%mpi_node_count
+#define MPI_NEXT_NODE ( (mpi_node_id+1)%mpi_node_count )
+#define MPI_PREV_NODE ( (mpi_node_id+mpi_node_count-1)%mpi_node_count )
 #endif
 
 #include "globals.h" // MAX_COORD

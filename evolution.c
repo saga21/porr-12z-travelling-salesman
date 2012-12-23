@@ -3,12 +3,16 @@
 #include <math.h> // sqrtf
 #include <string.h>
 #include <float.h> // FLT_MAX
+
+#define USE_MPI 1
+
 #ifdef USE_OMP
 #include <omp.h> // omp_get_thread_num
 #endif
 #ifdef USE_MPI
 #include <mpi.h>
 #endif
+
 #include <GL/glut.h>
 #include <GL/gl.h>
 
@@ -207,18 +211,45 @@ void destroy_weight_matrix() {
 
 // ----------------------------------------------------------------------------
 
-void generate_towns() {
+void init_towns() {
 
 	int i;
 	
 	// Allocate memory
 	towns = (struct town*)malloc(sizeof(struct town)*towns_count);
 
+#ifdef USE_MPI
+
+	if (mpi_node_id == 0) {
+		// Generate towns
+		for (i = 0; i < towns_count; i++) {
+			towns[i].x = - MAX_COORD + (float)rand()/((float)RAND_MAX/MAX_COORD/2);
+			towns[i].y = - MAX_COORD + (float)rand()/((float)RAND_MAX/MAX_COORD/2);
+		}
+	}
+	// TODO: remove this else block after test of MPI_Bcast is complete
+	else {
+		 memset(towns, 0, 4);
+	}
+
+	// TODO: Check if broadcast is ok
+	printf("mpi_node_count: %d.\n", mpi_node_count);
+	if (mpi_node_count > 1) {
+		printf("MPI_Bcast test: node %d, before bcast, data: %d %d %d %d\n", mpi_node_id, towns[0].x, towns[0].y,
+			towns[1].x, towns[1].y);
+		MPI_Bcast(towns, sizeof(struct town)*towns_count, MPI_INT, 0, MPI_COMM_WORLD);
+		printf("MPI_Bcast test: node %d, after  bcast, data: %d %d %d %d\n", mpi_node_id, towns[0].x, towns[0].y,
+			towns[1].x, towns[1].y);
+	}
+
+#else
 	// Generate towns
 	for (i = 0; i < towns_count; i++) {
 		towns[i].x = - MAX_COORD + (float)rand()/((float)RAND_MAX/MAX_COORD/2);
 		towns[i].y = - MAX_COORD + (float)rand()/((float)RAND_MAX/MAX_COORD/2);
 	}
+#endif
+
 }
 
 // ----------------------------------------------------------------------------
@@ -288,7 +319,7 @@ void init(int argc, char **argv) {
 	if (m_constant==0) m_constant = DEFAULT_M_CONSTANT;
 	if (thread_count==0) thread_count = DEFAULT_THREAD_COUNT;
 	
-	generate_towns();
+	init_towns();
 
 	// Generate connectivity weight matrix
 	generate_weight_matrix();
