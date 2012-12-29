@@ -6,6 +6,10 @@
 #include <GL/gl.h>
 
 // TODO: Dlaczego musze jeszcze raz uzyc define, skoro jest juz w main?
+//Bo on to kompiluje oddzielnie, każdy plik z osobna razem z ich includami a potem linkuje
+//preprocesor dziala przed linkowaniem stad nie widzi defina w main. Taka jest moja teoria ;)
+//Można by wrzucić to do globals.h i zaincludować albo można by użyć przełącznika -DUSE_MPI=1
+//podczas kompilacji
 #define USE_MPI 1
 
 #ifdef USE_MPI
@@ -163,10 +167,57 @@ void idle(void) {
 	int *cities_array;
 	int recv_flag;
 	MPI_Status status;
+	int i = 0,j = 0, k = 0, count;
 #endif
 
+
+#ifdef USE_MPI
+	//Jeśli jest coś do odebrania to odbieramy i pomijamy tworzenie dzieci przyjmując za dzieci odebrane osobniki
+
+	//******** Receiving ********//
+	// Test if can receive message
+	MPI_Iprobe(MPI_PREV_NODE, 0, MPI_COMM_WORLD, &recv_flag, &status);
+	// If can receive
+	if (recv_flag) {
+		count = TRANSFER_COUNT * towns_count;
+		// Alloc buffer
+		cities_array = (int*)malloc(count * sizeof(int));
+
+		// Blocking receive
+		MPI_Recv((void*)cities_array, count, MPI_INT, MPI_PREV_NODE, 0, MPI_COMM_WORLD, &status);
+
+		// Print what've received
+		printf("Node %d received (from prev: %d) buffer: %d, %d, %d ...\n",
+			mpi_node_id, MPI_PREV_NODE, cities_array[0], cities_array[1], cities_array[2]);
+	
+		//-----------------------------------
+		//zapisujemy kolejne przesłane osobniki jako nowe dzieci i wplatamy je w populacje
+		//UWAGA. ilość przesłanych dzieci powinna być taka sama jak dzieci które powstały by w wyniku
+		//krzyżowania. czyli TRANSFER_COUNT powinno być równe ilości generowanych dzieci.
+		while(i < count){
+			population[j][k] = cities_array[i];
+
+			++i; ++k;
+			if(i%towns_count == 0){
+				overall_lengths[j] = calculate_overall_length(j);
+				++j; k = 0;
+			}
+		}
+
+		mixinChildren();
+		//--------------------------------------
+
+		// Free buffer
+		free(cities_array);
+	}else{
+		evo_iter();
+	}
+#else
 	// Compute next generation
 	evo_iter();
+#endif
+
+
 	// Increase counter
 	++global_iteration_counter;
 
@@ -208,27 +259,6 @@ void idle(void) {
 		free(cities_array);
 	}
 	
-	//******** Receiving ********//
-	// Test if can receive message
-	MPI_Iprobe(MPI_PREV_NODE, 0, MPI_COMM_WORLD, &recv_flag, &status);
-	// If can receive
-	if (recv_flag) {
-
-		// Alloc buffer
-		cities_array = (int*)malloc(TRANSFER_COUNT * towns_count * sizeof(int));
-
-		// Blocking receive
-		MPI_Recv((void*)cities_array, TRANSFER_COUNT * towns_count, MPI_INT, MPI_PREV_NODE, 0, MPI_COMM_WORLD, &status);
-
-		// Print what've received
-		printf("Node %d received (from prev: %d) buffer: %d, %d, %d ...\n",
-			mpi_node_id, MPI_PREV_NODE, cities_array[0], cities_array[1], cities_array[2]);
-	
-		//TODO: Insert to population data from received cities_array
-
-		// Free buffer
-		free(cities_array);
-	}
 #endif
 }
 
