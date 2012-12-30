@@ -167,7 +167,7 @@ void idle(void) {
 	int *cities_array;
 	int recv_flag;
 	MPI_Status status;
-	int i = 0,j = 0, k = 0, count;
+	int i = 0,j = mi_constant, k = 0, count;
 	unsigned seed;
 	seed = 25234 + global_iteration_counter;
 #endif
@@ -193,21 +193,18 @@ void idle(void) {
 		printf("Node %d received (from prev: %d) buffer: %d, %d, %d ...\n",
 			mpi_node_id, MPI_PREV_NODE, cities_array[0], cities_array[1], cities_array[2]);
 	
-		//-----------------------------------
-		//zapisujemy kolejne przesłane osobniki jako nowe dzieci i wplatamy je w populacje
-		//UWAGA. ilość przesłanych dzieci powinna być taka sama jak dzieci które powstały by w wyniku
-		//krzyżowania. czyli TRANSFER_COUNT powinno być równe ilości generowanych dzieci.
-		// while(i < count){
-		// 	population[j][k] = cities_array[i];
+		//----------------------------------- wplatanie --------------------
+		while(i < count){
+			population[j][k] = cities_array[i];
 
-		// 	++i; ++k;
-		// 	if(i%towns_count == 0){
-		// 		overall_lengths[j] = calculate_overall_length(j);
-		// 		++j; k = 0;
-		// 	}
-		// }
+			++i; ++k;
+			if(i%towns_count == 0){
+				overall_lengths[j] = calculate_overall_length(j);
+				++j; k = 0;
+			}
+		}
 
-		// mixinChildren();
+		mixin(TRANSFER_COUNT+mi_constant);
 		//--------------------------------------
 
 		// Free buffer

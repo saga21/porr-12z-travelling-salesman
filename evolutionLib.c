@@ -215,13 +215,12 @@ int is_crossing(int a, int b, int i, int j){
 }
 
 
-
- void mixinChildren(){
- 	int i,j,c,r;
+void mixin(int max){
+	int i,j,c,r;
 
  	c = mi_constant/m_constant;
 
- 	for(i = mi_constant; i < M_MI; ++i){
+ 	for(i = mi_constant; i < max; ++i){
  		for(j = 0; j<c; ++j){
  			r = rand() % mi_constant;
  			if(overall_lengths[r]>overall_lengths[i]){
@@ -231,6 +230,11 @@ int is_crossing(int a, int b, int i, int j){
  			}
  		}
  	}
+}
+
+
+ void mixinChildren(){
+ 	mixin(M_MI);
  }
 
 
