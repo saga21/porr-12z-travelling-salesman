@@ -219,28 +219,41 @@ void init_towns() {
 	towns = (struct town*)malloc(sizeof(struct town)*towns_count);
 
 #ifdef USE_MPI
+	float *towns_flat;
+	MPI_Status status;
+	int j;
+
+	towns_flat = (float*)malloc(sizeof(float)*towns_count*2);
 
 	if (mpi_node_id == 0) {
 		// Generate towns
-		for (i = 0; i < towns_count; i++) {
+		for (i = 0, j = 0; i < towns_count; i++) {
 			towns[i].x = - MAX_COORD + (float)rand()/((float)RAND_MAX/MAX_COORD/2);
 			towns[i].y = - MAX_COORD + (float)rand()/((float)RAND_MAX/MAX_COORD/2);
+		
+			towns_flat[j]	= towns[i].x;
+			towns_flat[j+1]	= towns[i].y;
+			j+=2;
 		}
 	}
-	// TODO: remove this else block after test of MPI_Bcast is complete
-	else {
-		 memset(towns, 0, 4);
+	
+	if (mpi_node_count > 1) {
+		printf("MPI_Bcast test: node %d, before bcast, data: %f %f %f %f\n", mpi_node_id, towns[0].x, towns[0].y,
+			towns[1].x, towns[1].y);
+		MPI_Bcast(towns_flat, 2*towns_count, MPI_FLOAT, 0, MPI_COMM_WORLD);
+		printf("MPI_Bcast test: node %d, after  bcast, data: %f %f %f %f\n", mpi_node_id, towns[0].x, towns[0].y,
+			towns[1].x, towns[1].y);
+	
+		if (mpi_node_id != 0) {
+			for (i = 0, j = 0; i < towns_count; ++i) {
+				towns[i].x = towns_flat[j];
+				towns[i].y = towns_flat[j+1];
+				j += 2;
+			}
+		}
 	}
 
-	// TODO: Check if broadcast is ok
-	printf("mpi_node_count: %d.\n", mpi_node_count);
-	if (mpi_node_count > 1) {
-		printf("MPI_Bcast test: node %d, before bcast, data: %d %d %d %d\n", mpi_node_id, towns[0].x, towns[0].y,
-			towns[1].x, towns[1].y);
-		MPI_Bcast(towns, sizeof(struct town)*towns_count, MPI_INT, 0, MPI_COMM_WORLD);
-		printf("MPI_Bcast test: node %d, after  bcast, data: %d %d %d %d\n", mpi_node_id, towns[0].x, towns[0].y,
-			towns[1].x, towns[1].y);
-	}
+	free(towns_flat);
 
 #else
 	// Generate towns
