@@ -168,6 +168,8 @@ void idle(void) {
 	int recv_flag;
 	MPI_Status status;
 	int i = 0,j = 0, k = 0, count;
+	unsigned seed;
+	seed = 25234 + global_iteration_counter;
 #endif
 
 
@@ -179,6 +181,7 @@ void idle(void) {
 	MPI_Iprobe(MPI_PREV_NODE, 0, MPI_COMM_WORLD, &recv_flag, &status);
 	// If can receive
 	if (recv_flag) {
+		printf("can receive message %d\n", mpi_node_id);
 		count = TRANSFER_COUNT * towns_count;
 		// Alloc buffer
 		cities_array = (int*)malloc(count * sizeof(int));
@@ -194,24 +197,25 @@ void idle(void) {
 		//zapisujemy kolejne przesłane osobniki jako nowe dzieci i wplatamy je w populacje
 		//UWAGA. ilość przesłanych dzieci powinna być taka sama jak dzieci które powstały by w wyniku
 		//krzyżowania. czyli TRANSFER_COUNT powinno być równe ilości generowanych dzieci.
-		while(i < count){
-			population[j][k] = cities_array[i];
+		// while(i < count){
+		// 	population[j][k] = cities_array[i];
 
-			++i; ++k;
-			if(i%towns_count == 0){
-				overall_lengths[j] = calculate_overall_length(j);
-				++j; k = 0;
-			}
-		}
+		// 	++i; ++k;
+		// 	if(i%towns_count == 0){
+		// 		overall_lengths[j] = calculate_overall_length(j);
+		// 		++j; k = 0;
+		// 	}
+		// }
 
-		mixinChildren();
+		// mixinChildren();
 		//--------------------------------------
 
 		// Free buffer
 		free(cities_array);
-	}else{
+	}else{ 
 		evo_iter();
 	}
+	
 #else
 	// Compute next generation
 	evo_iter();
@@ -238,7 +242,9 @@ void idle(void) {
 
 	//******** Sending ********//
 	// If not sending to itself
-	if (mpi_node_id != MPI_NEXT_NODE && (rand_my(0)%SEND_EVERY_ITER)==0) {
+	
+	if (mpi_node_id != MPI_NEXT_NODE && (rand_my(&seed)%SEND_EVERY_ITER)==0) {
+		printf("sending data: %d\n",mpi_node_id);
 		
 		// Alloc buffer
 		cities_array = (int*)malloc(TRANSFER_COUNT * towns_count * sizeof(int));
@@ -246,7 +252,7 @@ void idle(void) {
 		// TODO: Prepare cities_array to send from best of population
 		cities_array[0] = 123456789;
 		cities_array[1] = mpi_node_id;
-		cities_array[2] = rand_my(0)%10;
+		cities_array[2] = rand_my(&seed)%10;
 
 		// Debug what we send
 		printf("Node %d sending (to next %d) buffer: %d, %d, %d ...\n", 

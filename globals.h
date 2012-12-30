@@ -10,7 +10,7 @@
 #define DEFAULT_THREAD_COUNT ( 2 )
 
 #define PRINT_EVERY_ITERS ( 100 )
-#define TRANSFER_COUNT ( 5 )
+#define TRANSFER_COUNT ( 3 )
 #define SEND_EVERY_ITER ( 500 )
 
 #ifdef _WIN32
