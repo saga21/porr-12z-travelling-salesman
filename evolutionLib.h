@@ -12,5 +12,6 @@ void mutate_swap_neighbours(int child, unsigned *seed);
 void mixinChildren();
 int is_crossing(int a, int b, int i, int j);
 void mutate_remove_crossover(int child, unsigned *seed);
+void mixin(int max);
 
 
