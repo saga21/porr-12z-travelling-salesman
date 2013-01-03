@@ -1,5 +1,8 @@
 #pragma once
 
+//#define USE_OMP 1
+#define USE_MPI 1
+
 // Default dimension of OpenGL Window
 #define DIM ( 600 )
 // Maximum coordinate of town
@@ -57,5 +60,5 @@ float overall_lengths_sum;
 float overall_lengths_weights_sum;
 int is_dirty;
 
-long clock_ms();
+long clock_ms(void);
 int rand_my(unsigned int* seed);

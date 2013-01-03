@@ -11,7 +11,7 @@ int best_index = 0;
 float best_value = FLT_MAX;
 int global_benchmark = INT_MAX;
 
-long clock_ms()
+long clock_ms(void)
 {
 #ifdef _WIN32
 	return (long)(clock() * 1000 / CLOCKS_PER_SEC);

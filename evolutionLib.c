@@ -46,7 +46,8 @@ void prepareChild(int a, int b, int child, int x, int y){
 	}
 }
 
-void checkDuplicates(int a, int b, int child, int x, int y){
+// int a - bylo nieuzywane, zakomentowalem
+void checkDuplicates(/*int a,*/ int b, int child, int x, int y){
 	int *counts;
 	int i,tmp;
 
@@ -90,11 +91,11 @@ int pmx(int parentA, int parentB, int childA, int childB, unsigned *seed){
 	//printf("parA: %d, parB: %d, childA: %d, x: %d, y: %d\n", parentA, parentB, childA, x, y);
 	
 	prepareChild(parentA, parentB, childA, x, y);
-	checkDuplicates(parentA, parentB, childA, x, y);
+	checkDuplicates(/*parentA,*/ parentB, childA, x, y);
 
 	if(childB >= 0){
 		prepareChild(parentB,parentA,childB,x,y);
-		checkDuplicates(parentB,parentA,childB,x,y);
+		checkDuplicates(/*parentB,*/parentA,childB,x,y);
 	}
 
 	return 0;
@@ -233,7 +234,7 @@ void mixin(int max){
 }
 
 
- void mixinChildren(){
+ void mixinChildren(void){
  	mixin(M_MI);
  }
 

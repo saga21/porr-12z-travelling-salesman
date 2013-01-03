@@ -4,10 +4,10 @@
 // i - print best and iteration
 // r/spacebar - draw best
 
-//#define USE_OMP 1
-#define USE_MPI 1
 #include <stdlib.h> // srand
 #include <time.h> // time
+
+#include "globals.h" // DIM, ...
 
 #ifdef USE_OMP	
 	#include <omp.h>
@@ -19,7 +19,6 @@
 // GLUT and OpenGL libraries
 #include <GL/glut.h>
 #include <GL/gl.h>
-#include "globals.h" // DIM, ...
 #include "evolution.h" // init
 #include "glut_impl.h" // display, reshape, ...
 
@@ -27,7 +26,7 @@
 
 int main (int argc, char **argv) {
 
-	srand ( time(NULL) );
+	srand ( (unsigned int)time(NULL) );
 
 #ifdef USE_OMP	
 	// Set dynamic thread count
