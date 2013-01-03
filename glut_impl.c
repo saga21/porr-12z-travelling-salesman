@@ -5,12 +5,7 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 
-// TODO: Dlaczego musze jeszcze raz uzyc define, skoro jest juz w main?
-//Bo on to kompiluje oddzielnie, każdy plik z osobna razem z ich includami a potem linkuje
-//preprocesor dziala przed linkowaniem stad nie widzi defina w main. Taka jest moja teoria ;)
-//Można by wrzucić to do globals.h i zaincludować albo można by użyć przełącznika -DUSE_MPI=1
-//podczas kompilacji
-#define USE_MPI 1
+#include "globals.h" // MAX_COORD
 
 #ifdef USE_MPI
 #include <mpi.h>
@@ -18,8 +13,8 @@
 #define MPI_PREV_NODE ( (mpi_node_id+mpi_node_count-1)%mpi_node_count )
 #endif
 
-#include "globals.h" // MAX_COORD
 #include "evolution.h" // evo_iter, print_population_info
+#include "evolutionLib.h" // mixin
 #include "glut_impl.h" // This header
 
 // ----------------------------------------------------------------------------
@@ -32,7 +27,7 @@ void drawString(char *s) {
 
 // ----------------------------------------------------------------------------
 
-void draw_best() {
+void draw_best(void) {
 
 	int i;
 	static char label[100];

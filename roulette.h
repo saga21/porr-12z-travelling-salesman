@@ -1,5 +1,5 @@
 #pragma once
 
-int getParentRoulette();
-void recalculateLengthsSum();
-void recalculateRouletteStats();
+int getParentRoulette(unsigned *seed);
+void recalculateLengthsSum(void);
+void recalculateRouletteStats(void);

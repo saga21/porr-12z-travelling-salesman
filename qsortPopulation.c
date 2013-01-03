@@ -42,6 +42,6 @@ void qsortPopulation(int l, int r){
 	//}
 }
 
-int split(l,r){
+int split(int l, int r){
 	return (l+r)/2;
 }

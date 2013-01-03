@@ -4,7 +4,7 @@
 #include "globals.h"
 
 
-void recalculateRouletteStats(){
+void recalculateRouletteStats(void){
 	int i;
 
 	recalculateLengthsSum();
@@ -16,7 +16,7 @@ void recalculateRouletteStats(){
 	}
 }
 
-void recalculateLengthsSum(){
+void recalculateLengthsSum(void){
 	int i;
 
 	overall_lengths_sum = 0;

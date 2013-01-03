@@ -4,7 +4,10 @@
 #include <string.h>
 #include <float.h> // FLT_MAX
 
-#define USE_MPI 1
+#include <GL/glut.h>
+#include <GL/gl.h>
+
+#include "globals.h"
 
 #ifdef USE_OMP
 #include <omp.h> // omp_get_thread_num
@@ -13,10 +16,6 @@
 #include <mpi.h>
 #endif
 
-#include <GL/glut.h>
-#include <GL/gl.h>
-
-#include "globals.h"
 #include "roulette.h"
 #include "qsortPopulation.h"
 #include "evolutionLib.h"
@@ -24,7 +23,7 @@
 
 // ----------------------------------------------------------------------------
 
-void generate_population() {
+void generate_population(void) {
 
 	int i, k, j, temp;
 
@@ -82,7 +81,7 @@ float calculate_overall_length(int index) {
 
 // ----------------------------------------------------------------------------
 
-float find_best(){
+float find_best(void){
 	int i;
 	best_value = FLT_MAX;
 
@@ -97,7 +96,7 @@ float find_best(){
 
 // ----------------------------------------------------------------------------
 
-void destroy_population() {
+void destroy_population(void) {
 	
 	int i;
 
@@ -109,11 +108,11 @@ void destroy_population() {
 
 // ----------------------------------------------------------------------------
 
-void print_best() {
+void print_best(void) {
 	
 	int i;
-	float v = 0.0;
-	float t = 0.0;
+	//float v = 0.0;
+	//float t = 0.0;
 	
 	fprintf(stderr, "[%d]", best_index);
 
@@ -176,7 +175,7 @@ void print_summary_info(int verbose) {
 
 // ----------------------------------------------------------------------------
 
-void generate_weight_matrix() {
+void generate_weight_matrix(void) {
 	
 	int i, j;
 	float tmp;
@@ -199,7 +198,7 @@ void generate_weight_matrix() {
 
 // ----------------------------------------------------------------------------
 
-void destroy_weight_matrix() {
+void destroy_weight_matrix(void) {
 	
 	int i;
 
@@ -211,18 +210,20 @@ void destroy_weight_matrix() {
 
 // ----------------------------------------------------------------------------
 
-void init_towns() {
+void init_towns(void) {
 
 	int i;
 	
+#ifdef USE_MPI
+	float *towns_flat;
+	//MPI_Status status;
+	int j;
+#endif
+
 	// Allocate memory
 	towns = (struct town*)malloc(sizeof(struct town)*towns_count);
 
 #ifdef USE_MPI
-	float *towns_flat;
-	MPI_Status status;
-	int j;
-
 	towns_flat = (float*)malloc(sizeof(float)*towns_count*2);
 
 	if (mpi_node_id == 0) {
@@ -267,13 +268,13 @@ void init_towns() {
 
 // ----------------------------------------------------------------------------
 
-void destroy_towns() {
+void destroy_towns(void) {
 
 	free(towns);
 }
 
 // ----------------------------------------------------------------------------
-void generate_population_overall_length(){
+void generate_population_overall_length(void){
 	int i;
 	overall_lengths_sum = 0;
 
@@ -288,7 +289,7 @@ void generate_population_overall_length(){
 }
 
 // ----------------------------------------------------------------------------
-void generate_overall_lenght_weights(){
+void generate_overall_lenght_weights(void){
 	int i;
 	overall_lengths_weights = (float*)malloc(mi_constant * sizeof(float));	
 	for(i = 0; i<mi_constant; ++i){
@@ -296,12 +297,12 @@ void generate_overall_lenght_weights(){
 	}
 }
 
-void destroy_overall_lenght_weights(){
+void destroy_overall_lenght_weights(void){
 	free(overall_lengths_weights);
 }
 
 // ----------------------------------------------------------------------------
-void destroy_population_overall_length(){
+void destroy_population_overall_length(void){
 	free(overall_lengths);
 }
 
@@ -352,7 +353,7 @@ void init(int argc, char **argv) {
 
 // ----------------------------------------------------------------------------
 
-void terminate() {
+void terminate(void) {
 	print_summary_info(1);
 	fprintf(stderr, "Quiting");
 	destroy_towns();
@@ -403,7 +404,7 @@ void evo_iter(void) {
 			y = getParentRoulette(&seed);
 			
 			//zrob dziecko
-			pmx(x, y, i, i+1,&seed);
+			pmx(x, y, i, i+1, &seed);
 
 			//mutate_reverse(i,&seed);
 			//mutate(i,&seed);
