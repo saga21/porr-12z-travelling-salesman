@@ -16,6 +16,7 @@
 #include "evolution.h" // evo_iter, print_population_info
 #include "evolutionLib.h" // mixin
 #include "glut_impl.h" // This header
+#include "qsortPopulation.h"
 
 // ----------------------------------------------------------------------------
 
@@ -234,21 +235,33 @@ void idle(void) {
 
 	//******** Sending ********//
 	// If not sending to itself
-	
+	int y;
+
 	if (mpi_node_id != MPI_NEXT_NODE && (rand_my(&seed)%SEND_EVERY_ITER)==0) {
 		printf("sending data: %d\n",mpi_node_id);
 		
 		// Alloc buffer
 		cities_array = (int*)malloc(TRANSFER_COUNT * towns_count * sizeof(int));
+
+		//qsort population so best are first
+		qsortPopulation(0,mi_constant);
+
+		//copy values
+		for(i = 0; i < TRANSFER_COUNT; ++i){
+			y = i*towns_count;
+			for(j = 0; j < towns_count; ++j){
+				cities_array[y + j] = population[i][j];
+			}
+		}
 		
-		// TODO: Prepare cities_array to send from best of population
-		cities_array[0] = 123456789;
-		cities_array[1] = mpi_node_id;
-		cities_array[2] = rand_my(&seed)%10;
+		// // TODO: Prepare cities_array to send from best of population
+		// cities_array[0] = 123456789;
+		// cities_array[1] = mpi_node_id;
+		// cities_array[2] = rand_my(&seed)%10;
 
 		// Debug what we send
-		printf("Node %d sending (to next %d) buffer: %d, %d, %d ...\n", 
-			mpi_node_id, MPI_NEXT_NODE, cities_array[0], cities_array[1], cities_array[2]);
+		// printf("Node %d sending (to next %d) buffer: %d, %d, %d ...\n", 
+			// mpi_node_id, MPI_NEXT_NODE, cities_array[0], cities_array[1], cities_array[2]);
 		
 		// Blocking sending
 		MPI_Send((void*)cities_array, TRANSFER_COUNT * towns_count, MPI_INT, MPI_NEXT_NODE, 0, MPI_COMM_WORLD);
