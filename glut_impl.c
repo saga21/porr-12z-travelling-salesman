@@ -165,6 +165,8 @@ void idle(void) {
 	MPI_Status status;
 	int i = 0,j = mi_constant, k = 0, count;
 	unsigned seed;
+	int y;
+
 	seed = 25234 + global_iteration_counter;
 #endif
 
@@ -235,7 +237,6 @@ void idle(void) {
 
 	//******** Sending ********//
 	// If not sending to itself
-	int y;
 
 	if (mpi_node_id != MPI_NEXT_NODE && (rand_my(&seed)%SEND_EVERY_ITER)==0) {
 		printf("sending data: %d\n",mpi_node_id);
